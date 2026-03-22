@@ -1,0 +1,670 @@
+/* ===== e-Sajda – Prayer Times UI ===== */
+:root {
+    --bg-primary: #0f1419;
+    --bg-card: #1a2332;
+    --bg-input: #243447;
+    --text-primary: #e7e9ea;
+    --text-secondary: #8b98a5;
+    --accent: #1d9bf0;
+    --accent-hover: #1a8cd8;
+    --accent-muted: rgba(29, 155, 240, 0.2);
+    --success: #00ba7c;
+    --error: #f4212e;
+    --border: #38444d;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+    --font: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+.app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+/* ----- Header ----- */
+.header {
+    text-align: center;
+    padding: 2rem 0 1.5rem;
+}
+
+.logo {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--accent), #7dd3fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.tagline {
+    margin: 0.25rem 0 0;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+/* ----- Main ----- */
+.main {
+    flex: 1;
+}
+
+/* ----- Cards ----- */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow);
+}
+
+/* ----- Controls ----- */
+.controls h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.location-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    font-family: var(--font);
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+}
+
+.btn-secondary {
+    background: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+    background: #2d3d4f;
+}
+
+.or {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.city-input-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 200px;
+}
+
+.city-input-autocomplete {
+    position: relative;
+    flex: 1;
+    min-width: 180px;
+}
+
+.city-input-wrap input {
+    width: 100%;
+    min-width: 0;
+}
+
+.suggestions-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 2px;
+    max-height: 220px;
+    overflow-y: auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow);
+    z-index: 100;
+}
+
+.suggestions-dropdown.hidden {
+    display: none !important;
+}
+
+.suggestion-item {
+    display: block;
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    font-family: var(--font);
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.suggestion-item:hover,
+.suggestion-item[aria-selected="true"] {
+    background: var(--bg-input);
+}
+
+.suggestion-item:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+}
+
+.suggestions-dropdown .suggestion-loading {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.suggestions-dropdown .suggestion-empty {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.status {
+    margin: 0.5rem 0 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.status.success {
+    color: var(--success);
+}
+
+.status.error {
+    color: var(--error);
+}
+
+/* ----- Form groups ----- */
+.options-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1.25rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.method-recommendation {
+    margin: 0.4rem 0 0;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.method-recommendation strong {
+    color: var(--accent);
+}
+
+.btn-why-method {
+    display: inline-block;
+    margin: 0.35rem 0 0;
+    padding: 0;
+    font-family: var(--font);
+    font-size: 0.8rem;
+    color: var(--accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.btn-why-method:hover {
+    color: var(--accent-hover);
+}
+
+.btn-why-method:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.why-method-content {
+    margin: 0.5rem 0 0;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    background: var(--bg-input);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--accent);
+}
+
+.why-method-content.hidden {
+    display: none !important;
+}
+
+.why-method-content p {
+    margin: 0;
+}
+
+.method-tip {
+    margin: 0.5rem 0 0;
+    font-size: 0.85rem;
+    color: var(--accent);
+    line-height: 1.4;
+}
+
+.method-tip.hidden {
+    display: none !important;
+}
+
+select,
+input[type="text"] {
+    padding: 0.6rem 0.75rem;
+    font-family: var(--font);
+    font-size: 0.9rem;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+}
+
+select:focus,
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-muted);
+}
+
+input[type="text"]::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.8;
+}
+
+.month-picker {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.month-picker.hidden {
+    display: none !important;
+}
+
+/* ----- Results ----- */
+.results-section.hidden {
+    display: none;
+}
+
+.results-header {
+    margin-bottom: 1rem;
+}
+
+.results-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.results-context {
+    margin: 0.5rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+}
+
+.results-location,
+.results-method {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.results-location strong,
+.results-method strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.results-meta {
+    margin: 0.35rem 0 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* ----- Today timings (list) ----- */
+.timings-today.hidden,
+.timings-month.hidden {
+    display: none !important;
+}
+
+.next-prayer-box {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 0.5rem;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+    background: var(--accent-muted);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-sm);
+}
+
+.next-prayer-box.hidden {
+    display: none !important;
+}
+
+.next-prayer-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.next-prayer-name {
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.next-prayer-countdown {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.prayer-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+}
+
+.prayer-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1rem;
+    background: var(--bg-input);
+    border-radius: var(--radius-sm);
+    border-left: 4px solid var(--accent);
+}
+
+.prayer-list li.next-prayer {
+    border-left-color: var(--success);
+    background: var(--bg-card);
+    box-shadow: 0 0 0 1px var(--success);
+}
+
+.prayer-list li.next-prayer .name::after {
+    content: ' • Next';
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--success);
+    margin-left: 0.35rem;
+}
+
+.prayer-list li .name {
+    font-weight: 500;
+}
+
+.prayer-list li .time {
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.compare-actions {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.btn-compare {
+    font-size: 0.85rem;
+}
+
+.comparison-panel {
+    margin-top: 1rem;
+}
+
+.comparison-panel.hidden {
+    display: none !important;
+}
+
+.comparison-title {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.comparison-intro {
+    margin: 0 0 1rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.comparison-intro code {
+    font-size: 0.8em;
+    padding: 0.1em 0.35em;
+    background: var(--bg-input);
+    border-radius: 4px;
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.comparison-table th,
+.comparison-table td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.comparison-table th {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.comparison-table td {
+    font-variant-numeric: tabular-nums;
+}
+
+.comparison-table .diff-positive { color: var(--text-secondary); }
+.comparison-table .diff-zero { color: var(--success); }
+
+/* ----- Month table ----- */
+.table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.prayer-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.prayer-table th,
+.prayer-table td {
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.prayer-table th {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.prayer-table td {
+    font-variant-numeric: tabular-nums;
+}
+
+.prayer-table tbody tr:hover {
+    background: var(--bg-input);
+}
+
+/* ----- Error ----- */
+.error-message {
+    background: rgba(244, 33, 46, 0.1);
+    border-color: var(--error);
+    color: var(--error);
+}
+
+.error-message.hidden {
+    display: none !important;
+}
+
+/* ----- Loading ----- */
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+}
+
+.loading.hidden {
+    display: none !important;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 1rem;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ----- Footer ----- */
+.footer {
+    padding: 1.5rem 0;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.footer a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+/* ----- Responsive ----- */
+@media (max-width: 600px) {
+    .app {
+        padding: 1rem;
+    }
+
+    .logo {
+        font-size: 1.6rem;
+    }
+
+    .location-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .city-input-wrap {
+        flex-direction: column;
+    }
+
+    .city-input-wrap input {
+        min-width: 0;
+    }
+
+    .options-row {
+        grid-template-columns: 1fr;
+    }
+
+    .month-picker {
+        flex-direction: column;
+    }
+
+    .prayer-table th,
+    .prayer-table td {
+        padding: 0.5rem 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .spinner {
+        animation-duration: 1.2s;
+    }
+}

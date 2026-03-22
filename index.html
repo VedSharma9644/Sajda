@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>e-Sajda | Prayer Times</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1 class="logo">e-Sajda</h1>
+            <p class="tagline">Daily Prayer Times</p>
+        </header>
+
+        <main class="main">
+            <section class="controls card">
+                <div class="location-section">
+                    <h2>Location</h2>
+                    <div class="location-actions">
+                        <button type="button" id="btn-use-location" class="btn btn-primary">
+                            <span class="btn-icon">📍</span> Use my location
+                        </button>
+                        <span class="or">or</span>
+                        <div class="city-input-wrap">
+                            <div class="city-input-autocomplete">
+                                <input type="text" id="input-city" placeholder="City, Country (e.g. London, UK)" autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions-dropdown" role="combobox">
+                                <div id="suggestions-dropdown" class="suggestions-dropdown hidden" role="listbox" aria-label="Location suggestions"></div>
+                            </div>
+                            <button type="button" id="btn-search-city" class="btn btn-secondary">Search</button>
+                        </div>
+                    </div>
+                    <p id="location-status" class="status" aria-live="polite"></p>
+                </div>
+
+                <div class="options-row">
+                    <div class="form-group method-form-group">
+                        <label for="select-method">Calculation method</label>
+                        <select id="select-method">
+                            <optgroup label="South Asia">
+                                <option value="1">University of Islamic Sciences, Karachi (India / Google)</option>
+                                <option value="20">Kementerian Agama Indonesia</option>
+                            </optgroup>
+                            <optgroup label="Middle East & Gulf">
+                                <option value="4" selected>Umm Al-Qura University, Makkah</option>
+                                <option value="5">Egyptian General Authority</option>
+                                <option value="8">Gulf Region</option>
+                                <option value="9">Kuwait</option>
+                                <option value="10">Qatar</option>
+                                <option value="16">Dubai</option>
+                                <option value="23">Jordan</option>
+                                <option value="13">Turkey</option>
+                            </optgroup>
+                            <optgroup label="North America">
+                                <option value="2">ISNA (Islamic Society of North America)</option>
+                            </optgroup>
+                            <optgroup label="Other regions">
+                                <option value="3">MWL (Muslim World League)</option>
+                                <option value="11">Singapore</option>
+                                <option value="12">France</option>
+                                <option value="15">Moonsighting Committee</option>
+                                <option value="17">JAKIM (Malaysia)</option>
+                            </optgroup>
+                        </select>
+                        <p id="method-recommendation" class="method-recommendation" aria-live="polite"></p>
+                        <button type="button" id="btn-why-method" class="btn-why-method" aria-expanded="false" aria-controls="why-method-content">Why does method matter?</button>
+                        <div id="why-method-content" class="why-method-content hidden" role="region" aria-label="Why method matters">
+                            <p>Different calculation methods use slightly different angles and rules, so prayer times can vary by a few minutes (or more for Isha). Many local mosques follow one method—e.g. Karachi in India, Umm Al-Qura in Saudi Arabia—so choosing the right one helps match what you see at the mosque or on Google.</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="view-mode">View</label>
+                        <select id="view-mode">
+                            <option value="today">Today</option>
+                            <option value="month">This month</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="month-picker" class="month-picker hidden">
+                    <div class="form-group">
+                        <label for="select-month">Month</label>
+                        <select id="select-month"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="select-year">Year</label>
+                        <select id="select-year"></select>
+                    </div>
+                </div>
+            </section>
+
+            <section id="results-section" class="results-section hidden">
+                <div class="results-header card">
+                    <h2 id="results-title">Prayer times</h2>
+                    <div id="results-context" class="results-context" aria-label="Location and calculation method">
+                        <p id="results-location" class="results-location"></p>
+                        <p id="results-method" class="results-method"></p>
+                    </div>
+                    <p id="results-meta" class="results-meta"></p>
+                    <p id="results-method-tip" class="method-tip hidden" role="note"></p>
+                </div>
+
+                <div id="today-timings" class="timings-today card hidden">
+                    <div id="next-prayer-box" class="next-prayer-box hidden" aria-live="polite">
+                        <span class="next-prayer-label">Next prayer</span>
+                        <span id="next-prayer-name" class="next-prayer-name"></span>
+                        <span id="next-prayer-countdown" class="next-prayer-countdown"></span>
+                    </div>
+                    <ul class="prayer-list" id="prayer-list" aria-label="Daily prayer times"></ul>
+                    <div class="compare-actions">
+                        <button type="button" id="btn-compare-karachi" class="btn btn-secondary btn-compare">Compare with Karachi method</button>
+                    </div>
+                </div>
+
+                <div id="comparison-panel" class="comparison-panel card hidden" aria-label="Method comparison">
+                    <h3 class="comparison-title">Method comparison</h3>
+                    <p class="comparison-intro">Same location and date: your selected method vs University of Islamic Sciences, Karachi (Aladhan <code>method=1</code>). Differences in minutes are approximate.</p>
+                    <div class="table-wrap">
+                        <table class="comparison-table" id="comparison-table" aria-label="Prayer time comparison">
+                            <thead>
+                                <tr>
+                                    <th>Prayer</th>
+                                    <th id="col-current">Current method</th>
+                                    <th>Karachi (method=1)</th>
+                                    <th>Diff (min)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comparison-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="month-timings" class="timings-month card hidden">
+                    <div class="table-wrap">
+                        <table class="prayer-table" id="prayer-table" aria-label="Monthly prayer times">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Fajr</th>
+                                    <th>Dhuhr</th>
+                                    <th>Asr</th>
+                                    <th>Maghrib</th>
+                                    <th>Isha</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prayer-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="error-message" class="error-message card hidden" role="alert"></div>
+            </section>
+
+            <section id="loading" class="loading hidden" aria-live="polite">
+                <div class="spinner"></div>
+                <p id="loading-message">Loading prayer times…</p>
+            </section>
+        </main>
+
+    </div>
+    <script src="js/app.js?v=6" type="module"></script>
+</body>
+</html>

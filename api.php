@@ -1,0 +1,223 @@
+<?php
+/**
+ * Prayer Times API Proxy
+ * Fetches prayer times from Aladhan API (https://aladhan.com/prayer-times-api)
+ * Handles both coordinates and address (city) lookup.
+ */
+
+header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST');
+header('Access-Control-Allow-Headers: Content-Type');
+
+// Only allow GET and POST
+if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
+    http_response_code(405);
+    echo json_encode(['success' => false, 'error' => 'Method not allowed']);
+    exit;
+}
+
+$input = array_merge($_GET, $_POST);
+
+/**
+ * Sanitize and get request parameters
+ */
+$latitude   = isset($input['latitude'])   ? trim($input['latitude'])   : null;
+$longitude  = isset($input['longitude'])  ? trim($input['longitude'])  : null;
+$address    = isset($input['address'])    ? trim($input['address'])    : null;
+$method     = isset($input['method'])     ? (int) $input['method']     : 4; // Default: Umm Al-Qura
+$date       = isset($input['date'])      ? trim($input['date'])       : null; // DD-MM-YYYY
+$month      = isset($input['month'])      ? (int) $input['month']      : null;
+$year       = isset($input['year'])       ? (int) $input['year']       : null;
+$action     = isset($input['action'])     ? trim($input['action'])     : 'today'; // 'today' | 'month'
+$timezone   = isset($input['timezone'])   ? trim($input['timezone'])   : null;   // e.g. America/New_York
+
+// Default date to today (DD-MM-YYYY)
+if (!$date) {
+    $date = date('d-m-Y');
+}
+
+/**
+ * Validate: need either (lat + lng) or address
+ */
+$byCoordinates = is_numeric($latitude) && is_numeric($longitude);
+$byAddress     = $address !== null && $address !== '';
+
+if (!$byCoordinates && !$byAddress) {
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'error'   => 'Please provide either latitude and longitude or an address (city/country).'
+    ]);
+    exit;
+}
+
+$baseUrl = 'https://api.aladhan.com/v1';
+
+if ($action === 'month') {
+    // Monthly calendar: require month and year
+    if (!$month || !$year) {
+        $month = (int) date('n');
+        $year  = (int) date('Y');
+    }
+
+    if ($byCoordinates) {
+        $url = sprintf(
+            '%s/calendar?latitude=%s&longitude=%s&method=%d&month=%d&year=%d',
+            $baseUrl,
+            urlencode($latitude),
+            urlencode($longitude),
+            $method,
+            $month,
+            $year
+        );
+    } else {
+        $url = sprintf(
+            '%s/calendarByAddress?address=%s&method=%d&month=%d&year=%d',
+            $baseUrl,
+            urlencode($address),
+            $method,
+            $month,
+            $year
+        );
+    }
+
+    if ($timezone) {
+        $url .= '&timezonestring=' . urlencode($timezone);
+    }
+} else {
+    // Single day timings
+    if ($byCoordinates) {
+        $url = sprintf(
+            '%s/timings/%s?latitude=%s&longitude=%s&method=%d',
+            $baseUrl,
+            $date,
+            urlencode($latitude),
+            urlencode($longitude),
+            $method
+        );
+    } else {
+        $url = sprintf(
+            '%s/timingsByAddress/%s?address=%s&method=%d',
+            $baseUrl,
+            $date,
+            urlencode($address),
+            $method
+        );
+    }
+
+    if ($timezone) {
+        $url .= '&timezonestring=' . urlencode($timezone);
+    }
+}
+
+$response = fetchUrl($url);
+
+if ($response === false || $response === null) {
+    http_response_code(502);
+    echo json_encode([
+        'success' => false,
+        'error'   => 'Could not reach prayer times service. Please try again in a moment.'
+    ]);
+    exit;
+}
+
+$data = json_decode($response, true);
+
+if (json_last_error() !== JSON_ERROR_NONE) {
+    http_response_code(502);
+    echo json_encode([
+        'success' => false,
+        'error'   => 'Invalid response from prayer times service.'
+    ]);
+    exit;
+}
+
+if (isset($data['code']) && $data['code'] !== 200) {
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'error'   => $data['data']['message'] ?? 'Invalid request to prayer times API.'
+    ]);
+    exit;
+}
+
+echo json_encode([
+    'success' => true,
+    'data'    => $data['data'],
+    'meta'    => $data['meta'] ?? null
+]);
+
+/**
+ * Fetch URL with cURL (preferred) or file_get_contents fallback.
+ * Tries with SSL verification first; on failure (e.g. missing CA bundle on Windows),
+ * retries with SSL verification disabled so prayer times still load.
+ */
+function fetchUrl($url) {
+    $body = fetchUrlCurl($url, true);
+    if ($body !== null) {
+        return $body;
+    }
+    // Often fails on Windows due to missing CA bundle (CURLE_SSL_CACERT 60)
+    $body = fetchUrlCurl($url, false);
+    if ($body !== null) {
+        return $body;
+    }
+    $body = fetchUrlStream($url, true);
+    if ($body !== null) {
+        return $body;
+    }
+    return fetchUrlStream($url, false);
+}
+
+/**
+ * HTTP GET via cURL. Returns response body as string, or null on any failure.
+ * `$verifySsl`: true uses normal certificate checks; false is a fallback when CA
+ * bundles are missing (common on some Windows PHP installs).
+ */
+function fetchUrlCurl($url, $verifySsl) {
+    if (!function_exists('curl_init')) {
+        return null;
+    }
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_TIMEOUT        => 20,
+        CURLOPT_CONNECTTIMEOUT => 15,
+        CURLOPT_HTTPHEADER     => [
+            'Accept: application/json',
+            'User-Agent: e-Sajda/1.0 (Prayer Times)'
+        ],
+        CURLOPT_SSL_VERIFYPEER => $verifySsl,
+        CURLOPT_SSL_VERIFYHOST => $verifySsl ? 2 : 0,
+        CURLOPT_ENCODING       => ''
+    ]);
+    $body = curl_exec($ch);
+    $errno = curl_errno($ch);
+    curl_close($ch);
+    if ($errno === 0 && $body !== false && $body !== '') {
+        return $body;
+    }
+    return null;
+}
+
+/**
+ * HTTP GET via PHP streams (`file_get_contents`). Used when cURL is not available.
+ * Same SSL verify flag meaning as `fetchUrlCurl`.
+ */
+function fetchUrlStream($url, $verifySsl) {
+    $context = stream_context_create([
+        'http' => [
+            'method'  => 'GET',
+            'header'  => "Accept: application/json\r\nUser-Agent: e-Sajda/1.0\r\n",
+            'timeout' => 20
+        ],
+        'ssl' => [
+            'verify_peer'       => $verifySsl,
+            'verify_peer_name'  => $verifySsl
+        ]
+    ]);
+    $body = @file_get_contents($url, false, $context);
+    return ($body !== false && $body !== '') ? $body : null;
+}
