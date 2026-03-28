@@ -1,5 +1,6 @@
 import { englishPlaceLabelFromNominatim } from './utils.js';
 import { esajdaLog } from './debug-log.js?v=21';
+import { initThemeToggle } from './theme.js';
 
 const PRAYERS = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
 const LABELS = { fajr: 'Fajr', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha' };
@@ -229,6 +230,7 @@ async function init() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+    initThemeToggle();
     init().catch((err) => {
         setText('page-error', err && err.message ? err.message : 'Failed to load prayer page.');
     });

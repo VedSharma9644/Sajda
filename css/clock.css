@@ -59,9 +59,9 @@
     width: 154px;
     height: 154px;
     border-radius: 50%;
-    background: radial-gradient(circle at 32% 28%, #253145 0%, #131d2b 60%, #0f1725 100%);
-    border: 4px solid #34445d;
-    box-shadow: inset 0 8px 16px rgba(0, 0, 0, 0.45), 0 8px 18px rgba(0, 0, 0, 0.25);
+    background: var(--clock-face-gradient);
+    border: 4px solid var(--clock-face-border);
+    box-shadow: var(--clock-face-shadow);
 }
 
 .clock-analog-face .mark {
@@ -70,7 +70,7 @@
     top: 8px;
     width: 2px;
     height: 12px;
-    background: #d7e4f6;
+    background: var(--clock-mark);
     transform-origin: 50% 69px;
     opacity: 0.92;
 }
@@ -100,19 +100,19 @@
 .clock-hand.hour {
     width: 5px;
     height: 42px;
-    background: #f4f7ff;
+    background: var(--clock-hand-hour);
 }
 
 .clock-hand.minute {
     width: 4px;
     height: 56px;
-    background: #b9d1ef;
+    background: var(--clock-hand-minute);
 }
 
 .clock-hand.second {
     width: 2px;
     height: 62px;
-    background: #5fb4ff;
+    background: var(--clock-hand-second);
 }
 
 .clock-center-dot {
@@ -123,8 +123,8 @@
     height: 10px;
     transform: translate(-50%, -50%);
     border-radius: 50%;
-    background: #f5fbff;
-    box-shadow: 0 0 0 2px #28364e;
+    background: var(--clock-center);
+    box-shadow: 0 0 0 2px var(--clock-center-ring);
 }
 
 .clock-date,
@@ -155,6 +155,7 @@
 .clock-btn.active {
     background: var(--accent);
     border-color: var(--accent);
+    color: var(--btn-on-accent);
 }
 
 .clock-mode {
@@ -168,7 +169,7 @@
     height: 100%;
     max-width: none;
     border-radius: 0;
-    background: #000;
+    background: var(--clock-fs-bg);
     border: none;
     display: flex;
     flex-direction: column;
@@ -188,14 +189,14 @@
 
 .clock-section.clock-fullscreen .clock-head p {
     font-size: 2.2rem;
-    color: #f0f4fb;
+    color: var(--clock-fs-text);
     margin-bottom: 0.8rem;
 }
 
 .clock-section.clock-fullscreen .clock-digital {
     font-size: 8rem;
     line-height: 1;
-    color: #fff;
+    color: var(--clock-fs-digital);
 }
 
 .clock-section.clock-fullscreen .clock-main-row {
@@ -223,12 +224,14 @@
 
 .clock-section.clock-fullscreen .clock-date {
     font-size: 2rem;
-    color: #d3deef;
+    color: var(--clock-fs-text);
+    opacity: 0.9;
     margin-top: 1.1rem;
 }
 
 .clock-section.clock-fullscreen .clock-timezone {
-    color: #9aaec8;
+    color: var(--clock-fs-text);
+    opacity: 0.75;
     margin-top: 0.65rem;
     font-size: 1rem;
 }
@@ -240,8 +243,9 @@
 }
 
 .clock-section.clock-fullscreen .clock-btn {
-    background: #101319;
-    border-color: #344055;
+    background: var(--clock-fs-btn-bg);
+    border-color: var(--clock-fs-btn-border);
+    color: var(--clock-fs-text);
 }
 
 .clock-section.clock-fullscreen .clock-mode {

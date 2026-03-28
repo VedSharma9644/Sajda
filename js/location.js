@@ -9,7 +9,7 @@
 import { state } from './state.js';
 import { $, show, hide } from './dom.js';
 import { escapeHtml, getDisplayLocation, englishPlaceLabelFromNominatim } from './utils.js';
-import { setStatus, setResultsContext, showLoading } from './render.js?v=21';
+import { setStatus, setResultsContext, showLoading } from './render.js?v=24';
 import { updateMethodRecommendation } from './recommendations.js';
 import { fetchPrayerTimes } from './api.js';
 import { replaceBrowserUrlWithCity, clearCityFromBrowserUrl, readCityFromUrl } from './location-routing.js';

@@ -1,6 +1,6 @@
 /* ----- Error ----- */
 .error-message {
-    background: rgba(244, 33, 46, 0.1);
+    background: var(--error-bg);
     border-color: var(--error);
     color: var(--error);
 }

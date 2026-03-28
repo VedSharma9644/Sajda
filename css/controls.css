@@ -38,7 +38,7 @@
 
 .btn-primary {
     background: var(--accent);
-    color: #fff;
+    color: var(--btn-on-accent);
 }
 
 .btn-primary:hover {
@@ -52,7 +52,7 @@
 }
 
 .btn-secondary:hover {
-    background: #2d3d4f;
+    background: var(--bg-input-hover);
 }
 
 .or {

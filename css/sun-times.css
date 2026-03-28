@@ -1,0 +1,87 @@
+/* ----- Sunrise & sunset ----- */
+.sun-times-section {
+    margin-top: 1.15rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+/* Standalone card in weather+sun row */
+.sun-times-section.sun-times-strip-card {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+}
+
+.sun-times-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.35rem;
+}
+
+.sun-times-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.35;
+    text-align: left;
+    flex: 1;
+}
+
+.sun-times-chevron {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg-input);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+    user-select: none;
+}
+
+.sun-times-list {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+}
+
+.sun-times-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.65rem 0.85rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.92rem;
+}
+
+.sun-times-row:last-child {
+    border-bottom: none;
+}
+
+.sun-times-icon {
+    font-size: 1.35rem;
+    line-height: 1;
+    width: 2rem;
+    text-align: center;
+}
+
+.sun-times-label {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.sun-times-value {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+    text-align: right;
+    font-weight: 500;
+}

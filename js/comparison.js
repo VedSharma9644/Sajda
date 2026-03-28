@@ -9,7 +9,7 @@ import { PRAYERS } from './config.js';
 import { state } from './state.js';
 import { $, show } from './dom.js';
 import { timeToMinutes } from './utils.js';
-import { setStatus } from './render.js?v=21';
+import { setStatus } from './render.js?v=24';
 import { buildComparisonParams } from './api.js';
 import { esajdaLog } from './debug-log.js?v=21';
 

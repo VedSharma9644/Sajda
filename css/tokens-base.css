@@ -1,8 +1,87 @@
 /* ===== e-Sajda – Design tokens and base ===== */
+/* Default: light mode. Dark: <html data-theme="dark"> */
+
 :root {
+    color-scheme: light;
+    --bg-primary: #f0f4f8;
+    --bg-card: #ffffff;
+    --bg-input: #e8edf4;
+    --bg-input-hover: #dde5ef;
+    --text-primary: #0f1419;
+    --text-secondary: #5c6b7a;
+    --accent: #0d8bd9;
+    --accent-hover: #0a7ac0;
+    --accent-muted: rgba(13, 139, 217, 0.14);
+    --success: #059669;
+    --error: #dc2626;
+    --error-bg: rgba(220, 38, 38, 0.1);
+    --border: #d0dae4;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 24px rgba(15, 20, 25, 0.08);
+    --font: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    --logo-gradient-end: #38bdf8;
+    --link-hover: #0284c7;
+    --btn-on-accent: #ffffff;
+
+    /* Analog clock */
+    --clock-face-gradient: radial-gradient(circle at 32% 28%, #f8fafc 0%, #e2e8f0 55%, #cbd5e1 100%);
+    --clock-face-border: #94a3b8;
+    --clock-face-shadow: inset 0 6px 14px rgba(255, 255, 255, 0.5), 0 6px 16px rgba(15, 23, 42, 0.12);
+    --clock-mark: #475569;
+    --clock-hand-hour: #1e293b;
+    --clock-hand-minute: #334155;
+    --clock-hand-second: #0d8bd9;
+    --clock-center: #ffffff;
+    --clock-center-ring: #64748b;
+
+    /* Prayer detail pages */
+    --prayer-top-muted: #64748b;
+    --prayer-breadcrumb: #64748b;
+    --prayer-city-muted: #475569;
+    --hero-meta: #64748b;
+    --hero-badge-bg: #e2e8f0;
+    --hero-badge-fg: #334155;
+    --hero-badge-border: #cbd5e1;
+    --hero-badge-delta-bg: #f1f5f9;
+    --hero-badge-delta-fg: #1e293b;
+    --hero-badge-accent-bg: #0d8bd9;
+    --hero-badge-accent-fg: #ffffff;
+    --hero-badge-soon-bg: #0369a1;
+    --hero-badge-soon-fg: #f0f9ff;
+    --prayer-tab-fg: #334155;
+    --prayer-tab-active-fg: #0369a1;
+    --daily-item-bg: #f8fafc;
+    --daily-item-fg: #1e293b;
+    --daily-item-hover-bg: #e2e8f0;
+    --daily-item-active-bg: #dbeafe;
+    --daily-item-active-fg: #1e40af;
+    --daily-item-active-border: #3b82f6;
+    --daily-item-month: #64748b;
+    --prayer-hero-gradient: linear-gradient(180deg, #e0f2fe 0%, #f8fafc 100%);
+    --prayer-hero-border: #bae6fd;
+    --prayer-hero-shadow: 0 16px 34px rgba(14, 116, 144, 0.12);
+    --prayer-hero-subtitle: #0369a1;
+    --prayer-hero-city: #0c4a6e;
+    --prayer-hero-label: #64748b;
+    --prayer-hero-select-bg: #ffffff;
+    --prayer-hero-select-fg: #0f1419;
+    --prayer-hero-select-border: #7dd3fc;
+
+    /* Fullscreen clock (keeps high contrast in both themes) */
+    --clock-fs-bg: #0a0c10;
+    --clock-fs-text: #f0f4fb;
+    --clock-fs-digital: #ffffff;
+    --clock-fs-btn-bg: #1a1f2e;
+    --clock-fs-btn-border: #3d4a63;
+}
+
+[data-theme="dark"] {
+    color-scheme: dark;
     --bg-primary: #0f1419;
     --bg-card: #1a2332;
     --bg-input: #243447;
+    --bg-input-hover: #2d3d4f;
     --text-primary: #e7e9ea;
     --text-secondary: #8b98a5;
     --accent: #1d9bf0;
@@ -10,11 +89,54 @@
     --accent-muted: rgba(29, 155, 240, 0.2);
     --success: #00ba7c;
     --error: #f4212e;
+    --error-bg: rgba(244, 33, 46, 0.1);
     --border: #38444d;
-    --radius: 12px;
-    --radius-sm: 8px;
     --shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
-    --font: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    --logo-gradient-end: #7dd3fc;
+    --link-hover: #9ad1ff;
+    --btn-on-accent: #ffffff;
+
+    --clock-face-gradient: radial-gradient(circle at 32% 28%, #253145 0%, #131d2b 60%, #0f1725 100%);
+    --clock-face-border: #34445d;
+    --clock-face-shadow: inset 0 8px 16px rgba(0, 0, 0, 0.45), 0 8px 18px rgba(0, 0, 0, 0.25);
+    --clock-mark: #d7e4f6;
+    --clock-hand-hour: #f4f7ff;
+    --clock-hand-minute: #b9d1ef;
+    --clock-hand-second: #5fb4ff;
+    --clock-center: #f5fbff;
+    --clock-center-ring: #28364e;
+
+    --prayer-top-muted: #b8c6d9;
+    --prayer-breadcrumb: #8c96a8;
+    --prayer-city-muted: #a8b7ca;
+    --hero-meta: #9fb1cc;
+    --hero-badge-bg: #1b2a43;
+    --hero-badge-fg: #c7d7ee;
+    --hero-badge-border: #304563;
+    --hero-badge-delta-bg: #2a3140;
+    --hero-badge-delta-fg: #e4e8f0;
+    --hero-badge-accent-bg: #1b5ec7;
+    --hero-badge-accent-fg: #f2f8ff;
+    --hero-badge-soon-bg: #224b88;
+    --hero-badge-soon-fg: #eff7ff;
+    --prayer-tab-fg: #dce7f7;
+    --prayer-tab-active-fg: #cce9ff;
+    --daily-item-bg: #131d2b;
+    --daily-item-fg: #d7e0ee;
+    --daily-item-hover-bg: #172539;
+    --daily-item-active-bg: #183760;
+    --daily-item-active-fg: #e9f3ff;
+    --daily-item-active-border: #2d7de0;
+    --daily-item-month: #adc1dc;
+    --prayer-hero-gradient: linear-gradient(180deg, #0b1730 0%, #0a1424 100%);
+    --prayer-hero-border: #1f2e49;
+    --prayer-hero-shadow: 0 16px 34px rgba(0, 0, 0, 0.33);
+    --prayer-hero-subtitle: #b5c7de;
+    --prayer-hero-city: #f1f6ff;
+    --prayer-hero-label: #9fb0c8;
+    --prayer-hero-select-bg: #10233f;
+    --prayer-hero-select-fg: #dce9fb;
+    --prayer-hero-select-border: #2d476d;
 }
 
 *,
@@ -50,6 +172,20 @@ body {
 .header {
     text-align: center;
     padding: 2rem 0 1.5rem;
+    position: relative;
+}
+
+.header-brand {
+    padding-right: 5.5rem;
+    padding-left: 5.5rem;
+}
+
+@media (max-width: 520px) {
+    .header-brand {
+        padding-right: 0;
+        padding-left: 0;
+        padding-top: 2.5rem;
+    }
 }
 
 .logo {
@@ -57,7 +193,7 @@ body {
     font-size: 2rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-    background: linear-gradient(135deg, var(--accent), #7dd3fc);
+    background: linear-gradient(135deg, var(--accent), var(--logo-gradient-end));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -68,6 +204,60 @@ body {
     font-size: 0.95rem;
     color: var(--text-secondary);
     font-weight: 400;
+}
+
+.theme-toggle {
+    position: absolute;
+    top: 1.25rem;
+    right: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.75rem;
+    font-family: var(--font);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.theme-toggle:hover {
+    background: var(--bg-input);
+    color: var(--text-primary);
+}
+
+.theme-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.theme-toggle[aria-pressed="true"] {
+    background: var(--accent-muted);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.theme-toggle-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.theme-toggle-label {
+    min-width: 2.25rem;
+    text-align: left;
+}
+
+@media (max-width: 520px) {
+    .theme-toggle {
+        top: 0;
+        right: 50%;
+        transform: translateX(50%);
+    }
 }
 
 /* ----- Main ----- */

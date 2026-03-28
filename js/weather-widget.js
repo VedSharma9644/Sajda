@@ -5,7 +5,7 @@
  * The widget is intentionally independent from prayer rendering internals.
  */
 
-import { $, show, hide } from './dom.js';
+import { $, show, hide, syncWeatherSunstrip } from './dom.js';
 import { getDisplayLocation } from './utils.js';
 import { fetchWeatherForCurrentSelection } from './weather-api.js?v=21';
 
@@ -35,6 +35,7 @@ function showWeatherLoading() {
     setText('weather-status', 'Loading weather...');
     const section = $('weather-section');
     if (section) show(section);
+    syncWeatherSunstrip();
 }
 
 function renderWeather(payload) {
@@ -62,12 +63,15 @@ export async function refreshWeatherWidget() {
         const data = await fetchWeatherForCurrentSelection();
         if (myToken !== requestToken) return; // ignore stale responses
         renderWeather(data);
+        syncWeatherSunstrip();
     } catch (_) {
         if (myToken !== requestToken) return;
         setText('weather-status', 'Could not fetch weather right now.');
+        syncWeatherSunstrip();
     }
 }
 
 export function hideWeatherWidget() {
     hide($('weather-section'));
+    syncWeatherSunstrip();
 }

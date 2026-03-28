@@ -9,7 +9,7 @@
 import { state } from './state.js';
 import { $ } from './dom.js';
 import { getTimezone, getTodayDate } from './utils.js';
-import { showLoading, onApiResponse } from './render.js?v=21';
+import { showLoading, onApiResponse } from './render.js?v=24';
 import { esajdaLog } from './debug-log.js?v=21';
 
 /** Updates the small status line under the location controls (success / error messages). */

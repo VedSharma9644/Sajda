@@ -3,6 +3,10 @@
     margin-top: 1rem;
 }
 
+.weather-sunstrip .weather-section {
+    margin-top: 0;
+}
+
 .weather-head {
     display: flex;
     justify-content: space-between;
@@ -30,7 +34,7 @@
 .weather-main {
     margin-top: 0.8rem;
     display: grid;
-    grid-template-columns: 220px 1fr;
+    grid-template-columns: minmax(0, 220px) 1fr;
     gap: 0.9rem 1rem;
 }
 

@@ -3,9 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('esajda.theme') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) { /* ignore */ }
+        })();
+    </script>
     <title>e-Sajda | Prayer Times</title>
     <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/style.css?v=27">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -13,76 +22,17 @@
 <body>
     <div class="app">
         <header class="header">
-            <h1 class="logo">e-Sajda</h1>
-            <p class="tagline">Daily Prayer Times</p>
+            <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
+                <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+                <span class="theme-toggle-label">Dark mode</span>
+            </button>
+            <div class="header-brand">
+                <h1 class="logo">e-Sajda</h1>
+                <p class="tagline">Daily Prayer Times</p>
+            </div>
         </header>
 
         <main class="main">
-            <section id="clock-section" class="clock-section card hidden">
-                <div class="clock-head">
-                    <h3>Current time now</h3>
-                    <p id="clock-location"></p>
-                </div>
-                <div class="clock-main-row">
-                    <div class="clock-digital">
-                        <span id="clock-hour">--</span>
-                        <span class="sep">:</span>
-                        <span id="clock-minute">--</span>
-                        <span class="sep">:</span>
-                        <span id="clock-second">--</span>
-                    </div>
-                    <div class="clock-analog-wrap" aria-label="Analog clock">
-                        <div class="clock-analog-face">
-                            <span class="mark m12"></span>
-                            <span class="mark m1"></span>
-                            <span class="mark m2"></span>
-                            <span class="mark m3"></span>
-                            <span class="mark m4"></span>
-                            <span class="mark m5"></span>
-                            <span class="mark m6"></span>
-                            <span class="mark m7"></span>
-                            <span class="mark m8"></span>
-                            <span class="mark m9"></span>
-                            <span class="mark m10"></span>
-                            <span class="mark m11"></span>
-                            <span id="clock-hand-hour" class="clock-hand hour"></span>
-                            <span id="clock-hand-minute" class="clock-hand minute"></span>
-                            <span id="clock-hand-second" class="clock-hand second"></span>
-                            <span class="clock-center-dot"></span>
-                        </div>
-                    </div>
-                </div>
-                <p id="clock-date" class="clock-date"></p>
-                <p id="clock-timezone" class="clock-timezone"></p>
-                <div class="clock-controls">
-                    <button type="button" id="clock-btn-24" class="clock-btn active">24-hour</button>
-                    <button type="button" id="clock-btn-12" class="clock-btn">12-hour</button>
-                    <button type="button" id="clock-btn-fullscreen" class="clock-btn">Fullscreen</button>
-                    <span id="clock-mode" class="clock-mode">24-hour</span>
-                </div>
-            </section>
-
-            <section id="weather-section" class="weather-section card hidden">
-                <div class="weather-head">
-                    <h3>Current weather</h3>
-                    <p id="weather-location">—</p>
-                </div>
-                <p id="weather-status" class="weather-status">Set a location to see weather.</p>
-                <div class="weather-main">
-                    <div class="weather-primary">
-                        <span id="weather-icon" class="weather-icon">🌤️</span>
-                        <span id="weather-temp" class="weather-temp">—°C</span>
-                    </div>
-                    <div class="weather-meta-grid">
-                        <p><span>Feels like</span><strong id="weather-feels">—</strong></p>
-                        <p><span>Humidity</span><strong id="weather-humidity">—</strong></p>
-                        <p><span>Wind</span><strong id="weather-wind">—</strong></p>
-                        <p><span>Rain chance</span><strong id="weather-rain">—</strong></p>
-                    </div>
-                </div>
-                <p id="weather-minmax" class="weather-minmax"></p>
-            </section>
-
             <section class="controls card">
                 <div class="location-section">
                     <h2>Location</h2>
@@ -158,6 +108,81 @@
                 </div>
             </section>
 
+            <section id="clock-section" class="clock-section card hidden">
+                <div class="clock-head">
+                    <h3>Current time now</h3>
+                    <p id="clock-location"></p>
+                </div>
+                <div class="clock-main-row">
+                    <div class="clock-digital">
+                        <span id="clock-hour">--</span>
+                        <span class="sep">:</span>
+                        <span id="clock-minute">--</span>
+                        <span class="sep">:</span>
+                        <span id="clock-second">--</span>
+                    </div>
+                    <div class="clock-analog-wrap" aria-label="Analog clock">
+                        <div class="clock-analog-face">
+                            <span class="mark m12"></span>
+                            <span class="mark m1"></span>
+                            <span class="mark m2"></span>
+                            <span class="mark m3"></span>
+                            <span class="mark m4"></span>
+                            <span class="mark m5"></span>
+                            <span class="mark m6"></span>
+                            <span class="mark m7"></span>
+                            <span class="mark m8"></span>
+                            <span class="mark m9"></span>
+                            <span class="mark m10"></span>
+                            <span class="mark m11"></span>
+                            <span id="clock-hand-hour" class="clock-hand hour"></span>
+                            <span id="clock-hand-minute" class="clock-hand minute"></span>
+                            <span id="clock-hand-second" class="clock-hand second"></span>
+                            <span class="clock-center-dot"></span>
+                        </div>
+                    </div>
+                </div>
+                <p id="clock-date" class="clock-date"></p>
+                <p id="clock-timezone" class="clock-timezone"></p>
+                <div class="clock-controls">
+                    <button type="button" id="clock-btn-24" class="clock-btn active">24-hour</button>
+                    <button type="button" id="clock-btn-12" class="clock-btn">12-hour</button>
+                    <button type="button" id="clock-btn-fullscreen" class="clock-btn">Fullscreen</button>
+                    <span id="clock-mode" class="clock-mode">24-hour</span>
+                </div>
+            </section>
+
+            <div id="weather-sunstrip" class="weather-sunstrip hidden">
+                <section id="weather-section" class="weather-section card hidden">
+                    <div class="weather-head">
+                        <h3>Current weather</h3>
+                        <p id="weather-location">—</p>
+                    </div>
+                    <p id="weather-status" class="weather-status">Set a location to see weather.</p>
+                    <div class="weather-main">
+                        <div class="weather-primary">
+                            <span id="weather-icon" class="weather-icon">🌤️</span>
+                            <span id="weather-temp" class="weather-temp">—°C</span>
+                        </div>
+                        <div class="weather-meta-grid">
+                            <p><span>Feels like</span><strong id="weather-feels">—</strong></p>
+                            <p><span>Humidity</span><strong id="weather-humidity">—</strong></p>
+                            <p><span>Wind</span><strong id="weather-wind">—</strong></p>
+                            <p><span>Rain chance</span><strong id="weather-rain">—</strong></p>
+                        </div>
+                    </div>
+                    <p id="weather-minmax" class="weather-minmax"></p>
+                </section>
+
+                <section id="sun-times-section" class="sun-times-section sun-times-strip-card card hidden" aria-labelledby="sun-times-heading">
+                    <div class="sun-times-head">
+                        <h2 id="sun-times-heading" class="sun-times-title">Sunrise &amp; Sunset Times for <span id="sun-times-place">—</span></h2>
+                        <span class="sun-times-chevron" aria-hidden="true">›</span>
+                    </div>
+                    <ul class="sun-times-list" id="sun-times-list" aria-label="Sunrise and sunset times"></ul>
+                </section>
+            </div>
+
             <section id="results-section" class="results-section hidden">
                 <div class="results-header card">
                     <h2 id="results-title">Prayer times</h2>
@@ -176,6 +201,7 @@
                         <span id="next-prayer-countdown" class="next-prayer-countdown"></span>
                     </div>
                     <ul class="prayer-list" id="prayer-list" aria-label="Daily prayer times"></ul>
+
                     <div class="compare-actions">
                         <button type="button" id="btn-compare-karachi" class="btn btn-secondary btn-compare">Compare with Karachi method</button>
                     </div>
@@ -263,6 +289,6 @@
         </main>
 
     </div>
-    <script src="/js/app.js?v=21" type="module"></script>
+    <script src="/js/app.js?v=24" type="module"></script>
 </body>
 </html>

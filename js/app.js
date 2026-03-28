@@ -9,13 +9,14 @@
 import { MONTHS } from './config.js';
 import { state } from './state.js';
 import { $, show, hide } from './dom.js';
-import { fetchPrayerTimes } from './api.js?v=21';
+import { fetchPrayerTimes } from './api.js?v=24';
 import { updateMethodRecommendation } from './recommendations.js';
 import { runCompareWithKarachi } from './comparison.js';
-import { useLocation, useCity, bindLocationUI, applyCityFromUrlOnStartup } from './location.js?v=17';
+import { useLocation, useCity, bindLocationUI, applyCityFromUrlOnStartup } from './location.js?v=19';
 import { clearLocationCache } from './location-cache.js';
 import { startLocalClockWidget } from './clock-widget.js';
 import { esajdaLog } from './debug-log.js?v=21';
+import { initThemeToggle } from './theme.js';
 
 const FIRST_VISIT_LOCATION_PROMPT_KEY = 'esajda.location.prompted.v1';
 
@@ -45,6 +46,8 @@ function showMonthPicker(visible) {
  * One-time setup: attach listeners, build dropdowns, show initial recommendation text.
  */
 function init() {
+    initThemeToggle();
+
     const viewMode = $('view-mode');
     const selectMonth = $('select-month');
     const selectYear = $('select-year');

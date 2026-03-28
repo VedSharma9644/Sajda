@@ -1,0 +1,41 @@
+/* ----- Weather + sunrise/sunset side by side (½ page width each) ----- */
+.weather-sunstrip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Horizontal gutter between cards; vertical when stacked on small screens */
+    gap: 1.25rem 1.5rem;
+    align-items: stretch;
+    margin-top: 1.25rem;
+    /* Breathing room before “Prayer times” / results */
+    margin-bottom: 1.75rem;
+}
+
+.weather-sunstrip > .weather-section.card,
+.weather-sunstrip > .sun-times-section.card {
+    min-width: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* One panel hidden → the other uses full strip width */
+.weather-sunstrip:has(#weather-section.hidden) {
+    grid-template-columns: 1fr;
+}
+
+.weather-sunstrip:has(#sun-times-section.hidden) {
+    grid-template-columns: 1fr;
+}
+
+/* In a narrow column, stack temp row above meta grid */
+.weather-sunstrip .weather-main {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+}
+
+@media (max-width: 720px) {
+    .weather-sunstrip {
+        grid-template-columns: 1fr;
+        row-gap: 1.35rem;
+        margin-bottom: 1.5rem;
+    }
+}

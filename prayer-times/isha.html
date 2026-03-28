@@ -3,15 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('esajda.theme') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) { /* ignore */ }
+        })();
+    </script>
     <title>Isha Prayer Times | e-Sajda</title>
     <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/style.css?v=27">
 </head>
 <body data-prayer="isha">
     <div class="app">
         <header class="header">
-            <h1 class="logo">e-Sajda</h1>
-            <p class="tagline">Prayer Detail Page</p>
+            <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
+                <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+                <span class="theme-toggle-label">Dark mode</span>
+            </button>
+            <div class="header-brand">
+                <h1 class="logo">e-Sajda</h1>
+                <p class="tagline">Prayer Detail Page</p>
+            </div>
         </header>
         <main class="main prayer-page-main">
             <p class="breadcrumbs">Home / <span id="crumb-city">City</span> / Prayer Times / <span id="crumb-prayer">Isha Prayer Times</span></p>
@@ -66,6 +81,6 @@
             <p id="page-error" class="status error"></p>
         </main>
     </div>
-    <script src="/js/prayer-page.js?v=9" type="module"></script>
+    <script src="/js/prayer-page.js?v=10" type="module"></script>
 </body>
 </html>

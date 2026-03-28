@@ -19,3 +19,18 @@ export function show(el) {
 export function hide(el) {
     if (el) el.classList.add('hidden');
 }
+
+/** Shows `#weather-sunstrip` when weather or sun-times panel is visible. */
+export function syncWeatherSunstrip() {
+    const strip = document.getElementById('weather-sunstrip');
+    const weather = document.getElementById('weather-section');
+    const sun = document.getElementById('sun-times-section');
+    if (!strip) return;
+    const wVis = weather && !weather.classList.contains('hidden');
+    const sVis = sun && !sun.classList.contains('hidden');
+    if (wVis || sVis) {
+        strip.classList.remove('hidden');
+    } else {
+        strip.classList.add('hidden');
+    }
+}
