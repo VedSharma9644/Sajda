@@ -1,0 +1,95 @@
+/* ----- Responsive ----- */
+@media (max-width: 600px) {
+    .app {
+        padding: 1rem;
+    }
+
+    .logo {
+        font-size: 1.6rem;
+    }
+
+    .location-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .city-input-wrap {
+        flex-direction: column;
+    }
+
+    .city-input-wrap input {
+        min-width: 0;
+    }
+
+    .options-row {
+        grid-template-columns: 1fr;
+    }
+
+    .month-picker {
+        flex-direction: column;
+    }
+
+    .prayer-table th,
+    .prayer-table td {
+        padding: 0.5rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .prayer-page-top {
+        flex-direction: column;
+    }
+
+    .prayer-top-actions {
+        justify-content: flex-start;
+    }
+
+    .method-select-wrap {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .daily-times {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .hero-time {
+        font-size: 2.9rem;
+    }
+
+    .prayer-page-main .prayer-page-card:first-of-type .prayer-page-city {
+        font-size: 1.45rem;
+    }
+
+    .clock-analog-face {
+        width: 124px;
+        height: 124px;
+    }
+
+    .clock-analog-face .mark {
+        transform-origin: 50% 54px;
+        height: 10px;
+    }
+
+    .clock-hand.hour { height: 33px; width: 4px; }
+    .clock-hand.minute { height: 44px; width: 3px; }
+    .clock-hand.second { height: 48px; width: 2px; }
+
+    .clock-main-row {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .weather-main {
+        grid-template-columns: 1fr;
+    }
+
+    .weather-meta-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .spinner {
+        animation-duration: 1.2s;
+    }
+}

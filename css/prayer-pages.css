@@ -1,0 +1,220 @@
+.rakat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin: 0.5rem 0 0.9rem;
+}
+
+.rakat-grid .k {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+}
+
+.rakat-grid .v {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.prayer-page-main {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.prayer-page-card {
+    padding: 1.1rem 1.2rem;
+}
+
+.prayer-top-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.78rem;
+    color: #b8c6d9;
+}
+
+.breadcrumbs {
+    color: #8c96a8;
+    margin: 0.15rem 0 0.35rem;
+    font-size: 0.82rem;
+}
+
+.prayer-page-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: start;
+}
+
+.prayer-page-city {
+    margin: 0.2rem 0 0;
+    color: #a8b7ca;
+}
+
+.hero-time {
+    margin: 0.35rem 0 0.2rem;
+    font-size: 4rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.hero-meta {
+    margin: 0.08rem 0;
+    color: #9fb1cc;
+}
+
+.hero-badges {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.1rem;
+}
+
+.hero-badge {
+    margin: 0;
+    display: inline-block;
+    font-size: 0.78rem;
+    line-height: 1;
+    padding: 0.45rem 0.65rem;
+    border-radius: 999px;
+    background: #1b2a43;
+    color: #c7d7ee;
+    border: 1px solid #304563;
+}
+
+.hero-badge-delta {
+    background: #2a3140;
+    color: #e4e8f0;
+}
+
+.hero-badge-now {
+    background: #1b5ec7;
+    border-color: #2d79e3;
+    color: #f2f8ff;
+}
+
+.hero-badge-soon {
+    background: #224b88;
+    border-color: #3164ad;
+    color: #eff7ff;
+}
+
+.hero-badge-past {
+    background: #1b5ec7;
+    border-color: #2d79e3;
+    color: #f2f8ff;
+}
+
+.method-select-wrap {
+    min-width: 240px;
+}
+
+.method-select-wrap select {
+    width: 100%;
+}
+
+.prayer-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.9rem;
+}
+
+.prayer-tab {
+    padding: 0.3rem 0.58rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: #dce7f7;
+    text-decoration: none;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.prayer-tab-active {
+    background: var(--accent-muted);
+    border-color: var(--accent);
+    color: #cce9ff;
+}
+
+.daily-times {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(100px, 1fr));
+    gap: 0.45rem;
+    margin-top: 0.9rem;
+}
+
+.daily-item {
+    background: #131d2b;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 0.58rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-size: 0.78rem;
+    text-decoration: none;
+    color: #d7e0ee;
+    text-align: center;
+    min-height: 70px;
+    justify-content: center;
+}
+
+.daily-item:hover {
+    border-color: #5478a7;
+    background: #172539;
+}
+
+.daily-item strong {
+    font-size: 0.96rem;
+}
+
+.daily-item-active {
+    border-color: #2d7de0;
+    background: #183760;
+    color: #e9f3ff;
+}
+
+.daily-item-month {
+    color: #adc1dc;
+}
+
+.prayer-page-main .prayer-page-card:first-of-type {
+    background: linear-gradient(180deg, #0b1730 0%, #0a1424 100%);
+    border: 1px solid #1f2e49;
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.33);
+}
+
+.prayer-page-main .prayer-page-card:first-of-type .prayer-page-top {
+    align-items: center;
+}
+
+.prayer-page-main .prayer-page-card:first-of-type #hero-title {
+    font-size: 0.92rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #b5c7de;
+    margin: 0;
+}
+
+.prayer-page-main .prayer-page-card:first-of-type .prayer-page-city {
+    margin-top: 0.5rem;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #f1f6ff;
+}
+
+.prayer-page-main .prayer-page-card:first-of-type .method-select-wrap label {
+    color: #9fb0c8;
+    font-size: 0.82rem;
+}
+
+.prayer-page-main .prayer-page-card:first-of-type .method-select-wrap select {
+    background: #10233f;
+    color: #dce9fb;
+    border-color: #2d476d;
+}

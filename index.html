@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>e-Sajda | Prayer Times</title>
     <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -18,6 +18,71 @@
         </header>
 
         <main class="main">
+            <section id="clock-section" class="clock-section card hidden">
+                <div class="clock-head">
+                    <h3>Current time now</h3>
+                    <p id="clock-location"></p>
+                </div>
+                <div class="clock-main-row">
+                    <div class="clock-digital">
+                        <span id="clock-hour">--</span>
+                        <span class="sep">:</span>
+                        <span id="clock-minute">--</span>
+                        <span class="sep">:</span>
+                        <span id="clock-second">--</span>
+                    </div>
+                    <div class="clock-analog-wrap" aria-label="Analog clock">
+                        <div class="clock-analog-face">
+                            <span class="mark m12"></span>
+                            <span class="mark m1"></span>
+                            <span class="mark m2"></span>
+                            <span class="mark m3"></span>
+                            <span class="mark m4"></span>
+                            <span class="mark m5"></span>
+                            <span class="mark m6"></span>
+                            <span class="mark m7"></span>
+                            <span class="mark m8"></span>
+                            <span class="mark m9"></span>
+                            <span class="mark m10"></span>
+                            <span class="mark m11"></span>
+                            <span id="clock-hand-hour" class="clock-hand hour"></span>
+                            <span id="clock-hand-minute" class="clock-hand minute"></span>
+                            <span id="clock-hand-second" class="clock-hand second"></span>
+                            <span class="clock-center-dot"></span>
+                        </div>
+                    </div>
+                </div>
+                <p id="clock-date" class="clock-date"></p>
+                <p id="clock-timezone" class="clock-timezone"></p>
+                <div class="clock-controls">
+                    <button type="button" id="clock-btn-24" class="clock-btn active">24-hour</button>
+                    <button type="button" id="clock-btn-12" class="clock-btn">12-hour</button>
+                    <button type="button" id="clock-btn-fullscreen" class="clock-btn">Fullscreen</button>
+                    <span id="clock-mode" class="clock-mode">24-hour</span>
+                </div>
+            </section>
+
+            <section id="weather-section" class="weather-section card hidden">
+                <div class="weather-head">
+                    <h3>Current weather</h3>
+                    <p id="weather-location">—</p>
+                </div>
+                <p id="weather-status" class="weather-status">Set a location to see weather.</p>
+                <div class="weather-main">
+                    <div class="weather-primary">
+                        <span id="weather-icon" class="weather-icon">🌤️</span>
+                        <span id="weather-temp" class="weather-temp">—°C</span>
+                    </div>
+                    <div class="weather-meta-grid">
+                        <p><span>Feels like</span><strong id="weather-feels">—</strong></p>
+                        <p><span>Humidity</span><strong id="weather-humidity">—</strong></p>
+                        <p><span>Wind</span><strong id="weather-wind">—</strong></p>
+                        <p><span>Rain chance</span><strong id="weather-rain">—</strong></p>
+                    </div>
+                </div>
+                <p id="weather-minmax" class="weather-minmax"></p>
+            </section>
+
             <section class="controls card">
                 <div class="location-section">
                     <h2>Location</h2>
@@ -155,6 +220,42 @@
                 <div id="error-message" class="error-message card hidden" role="alert"></div>
             </section>
 
+            <section id="prayer-detail-section" class="prayer-detail-section hidden">
+                <div class="card prayer-detail-card">
+                    <h2 id="prayer-detail-title">Prayer detail</h2>
+                    <p id="prayer-detail-time" class="prayer-detail-time">--:--</p>
+                    <p id="prayer-detail-tomorrow" class="prayer-detail-meta"></p>
+                    <p id="prayer-detail-status" class="prayer-detail-status"></p>
+                    <p id="prayer-detail-about" class="prayer-detail-about"></p>
+                </div>
+
+                <div class="card prayer-detail-card">
+                    <h3>Prayer guidance</h3>
+                    <p><strong>Intention (Niyyah):</strong> <span id="prayer-detail-niyyah"></span></p>
+                    <div class="rakat-grid">
+                        <div><span class="k">Sunnah</span><span id="prayer-detail-sunnah" class="v">—</span></div>
+                        <div><span class="k">Fard</span><span id="prayer-detail-fard" class="v">—</span></div>
+                    </div>
+                    <p><strong>Calculation authority:</strong> <span id="prayer-detail-method">—</span></p>
+                </div>
+
+                <div class="card prayer-detail-card">
+                    <h3>7-Day schedule</h3>
+                    <div class="table-wrap">
+                        <table class="prayer-table" aria-label="7-day prayer schedule">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Hijri</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prayer-detail-7day-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
             <section id="loading" class="loading hidden" aria-live="polite">
                 <div class="spinner"></div>
                 <p id="loading-message">Loading prayer times…</p>
@@ -162,6 +263,6 @@
         </main>
 
     </div>
-    <script src="js/app.js?v=6" type="module"></script>
+    <script src="/js/app.js?v=21" type="module"></script>
 </body>
 </html>

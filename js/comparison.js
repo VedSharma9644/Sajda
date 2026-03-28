@@ -9,8 +9,9 @@ import { PRAYERS } from './config.js';
 import { state } from './state.js';
 import { $, show } from './dom.js';
 import { timeToMinutes } from './utils.js';
-import { setStatus } from './render.js';
+import { setStatus } from './render.js?v=21';
 import { buildComparisonParams } from './api.js';
+import { esajdaLog } from './debug-log.js?v=21';
 
 /** Fills the comparison table and shows the panel. `current` is the user’s method; `karachi` is method 1. */
 export function renderComparison(current, karachi) {
@@ -51,15 +52,24 @@ export function runCompareWithKarachi() {
         btn.textContent = 'Loading…';
     }
 
-    const url = 'api.php?' + params.toString();
+    const url = '/api.php?' + params.toString();
+    esajdaLog('api', 'GET /api.php (compare Karachi)', { url });
     fetch(url, { method: 'GET' })
-        .then((res) => res.json())
-        .then((json) => {
+        .then((res) =>
+            res.json().then((json) => ({
+                json,
+                serverCache: res.headers.get('X-Esajda-Cache'),
+                ok: res.ok,
+                status: res.status
+            }))
+        )
+        .then(({ json, serverCache, ok, status }) => {
+            esajdaLog('api', '/api.php (compare) response', { status, serverCache: serverCache || 'unknown' });
             if (btn) {
                 btn.disabled = false;
                 btn.textContent = 'Compare with Karachi method';
             }
-            if (json.success && json.data) {
+            if (ok && json.success && json.data) {
                 renderComparison(state.lastTodayData, json.data);
             } else {
                 setStatus(json.error || 'Could not load Karachi method times.', 'error');

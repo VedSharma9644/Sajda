@@ -1,0 +1,86 @@
+/* ===== e-Sajda – Design tokens and base ===== */
+:root {
+    --bg-primary: #0f1419;
+    --bg-card: #1a2332;
+    --bg-input: #243447;
+    --text-primary: #e7e9ea;
+    --text-secondary: #8b98a5;
+    --accent: #1d9bf0;
+    --accent-hover: #1a8cd8;
+    --accent-muted: rgba(29, 155, 240, 0.2);
+    --success: #00ba7c;
+    --error: #f4212e;
+    --border: #38444d;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+    --font: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+.app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+/* ----- Header ----- */
+.header {
+    text-align: center;
+    padding: 2rem 0 1.5rem;
+}
+
+.logo {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--accent), #7dd3fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.tagline {
+    margin: 0.25rem 0 0;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+/* ----- Main ----- */
+.main {
+    flex: 1;
+}
+
+/* ----- Cards ----- */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow);
+}

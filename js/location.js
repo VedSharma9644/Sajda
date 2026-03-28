@@ -8,84 +8,20 @@
 
 import { state } from './state.js';
 import { $, show, hide } from './dom.js';
-import { escapeHtml, getDisplayLocation, compactPlaceForUrl, englishPlaceLabelFromNominatim } from './utils.js';
-import { setStatus, setResultsContext, showLoading } from './render.js';
+import { escapeHtml, getDisplayLocation, englishPlaceLabelFromNominatim } from './utils.js';
+import { setStatus, setResultsContext, showLoading } from './render.js?v=21';
 import { updateMethodRecommendation } from './recommendations.js';
 import { fetchPrayerTimes } from './api.js';
-
-/**
- * Shareable URL shape: `https://site/Jaipur%2C%20India` (one path segment, no query).
- * Static files and `api.php` are excluded when reading the path.
- */
-function replacePathWithPlaceLabel(placeLabel) {
-    try {
-        const trimmed = placeLabel.trim();
-        if (!trimmed) return;
-        const url = new URL(window.location.href);
-        url.pathname = '/' + encodeURIComponent(trimmed);
-        url.search = '';
-        history.replaceState(null, '', url.pathname + url.search + url.hash);
-    } catch (_) {
-        /* ignore invalid base URL (e.g. rare file:// edge cases) */
-    }
-}
-
-function replaceBrowserUrlWithCity(fullAddress) {
-    const compact = compactPlaceForUrl(fullAddress.trim()) || fullAddress.trim();
-    if (!compact) return;
-    replacePathWithPlaceLabel(compact);
-}
-
-function clearCityFromBrowserUrl() {
-    try {
-        const url = new URL(window.location.href);
-        url.pathname = '/';
-        url.search = '';
-        history.replaceState(null, '', url.pathname + url.search + url.hash);
-    } catch (_) {
-        /* ignore */
-    }
-}
-
-function readLegacyCityQuery() {
-    try {
-        const raw = new URL(window.location.href).searchParams.get('city');
-        if (raw == null) return null;
-        const trimmed = raw.trim();
-        return trimmed.length ? trimmed : null;
-    } catch (_) {
-        return null;
-    }
-}
-
-/** Decodes `/Place%2C%20Country` → place string, or null for `/`, static assets, or `api.php`. */
-function readCityFromPathname() {
-    try {
-        const path = new URL(window.location.href).pathname;
-        const seg = path.replace(/^\/+|\/+$/g, '');
-        if (!seg || seg.toLowerCase() === 'index.html') return null;
-        if (/\.[a-z0-9]{2,4}$/i.test(seg)) return null;
-        if (seg === 'api.php' || seg.indexOf('js/') === 0) return null;
-        const city = decodeURIComponent(seg).trim();
-        return city.length ? city : null;
-    } catch (_) {
-        return null;
-    }
-}
+import { replaceBrowserUrlWithCity, clearCityFromBrowserUrl, readCityFromUrl } from './location-routing.js';
+import { getCachedSuggestions, setCachedSuggestions, getCachedReverseLabel, setCachedReverseLabel } from './location-cache.js';
+import { esajdaLog } from './debug-log.js?v=21';
 
 /**
  * Applies the place from the current URL path (and migrates old `?city=` once).
  * Used on first load and on browser back/forward.
  */
 function applyCityFromCurrentUrl() {
-    let city = readCityFromPathname();
-    if (!city) {
-        const legacy = readLegacyCityQuery();
-        if (legacy) {
-            city = compactPlaceForUrl(legacy) || legacy;
-            replacePathWithPlaceLabel(city);
-        }
-    }
+    const city = readCityFromUrl();
     if (!city) return;
     const inputCity = $('input-city');
     if (inputCity) inputCity.value = city;
@@ -156,6 +92,11 @@ function fetchSuggestions(query) {
         closeSuggestions();
         return;
     }
+    const cached = getCachedSuggestions(query);
+    if (cached) {
+        showSuggestions(cached);
+        return;
+    }
     showSuggestionsLoading();
     const url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query) + '&format=json&addressdetails=1&namedetails=1&limit=6';
     fetch(url, {
@@ -169,6 +110,7 @@ function fetchSuggestions(query) {
         .then((res) => res.json())
         .then((data) => {
             if (Array.isArray(data) && data.length) {
+                setCachedSuggestions(query, data);
                 showSuggestions(data);
             } else {
                 showSuggestions([]);
@@ -257,10 +199,22 @@ function reverseGeocodeAndUpdateLocation() {
     if (!state.currentCoords) return;
     var lat = state.currentCoords.latitude;
     var lon = state.currentCoords.longitude;
+    var cachedLabel = getCachedReverseLabel(lat, lon);
+    if (cachedLabel) {
+        esajdaLog('nominatim', 'reverse geocode cache HIT', { lat, lon });
+        state.currentAddress = cachedLabel;
+        var cachedMethodName = state.lastTodayData && state.lastTodayData.meta && state.lastTodayData.meta.method && state.lastTodayData.meta.method.name
+            ? state.lastTodayData.meta.method.name
+            : '—';
+        setResultsContext(getDisplayLocation(), cachedMethodName);
+        updateMethodRecommendation();
+        return;
+    }
 
     var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + encodeURIComponent(lat) +
         '&lon=' + encodeURIComponent(lon) + '&zoom=18&addressdetails=1&namedetails=1&accept-language=en';
 
+    esajdaLog('nominatim', 'GET reverse (label)', { lat, lon });
     fetch(url, {
         method: 'GET',
         headers: {
@@ -299,6 +253,7 @@ function reverseGeocodeAndUpdateLocation() {
             var compact = [settlement, region, country].filter(Boolean).join(', ');
 
             state.currentAddress = compact || englishPlaceLabelFromNominatim(data) || null;
+            if (state.currentAddress) setCachedReverseLabel(lat, lon, state.currentAddress);
 
             // Update header context immediately after reverse geocoding resolves
             var methodName = state.lastTodayData && state.lastTodayData.meta && state.lastTodayData.meta.method && state.lastTodayData.meta.method.name
@@ -379,7 +334,7 @@ export function bindLocationUI() {
         if (suggestionsDropdown && inputCity && !suggestionsDropdown.contains(e.target) && e.target !== inputCity) closeSuggestions();
     });
 
-    window.addEventListener('popstate', () => applyCityFromCurrentUrl());
+    window.addEventListener('popstate', applyCityFromCurrentUrl);
 }
 
 /** If the page was opened with `?city=…`, run the same flow as a manual city search. */

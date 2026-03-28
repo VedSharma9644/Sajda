@@ -9,7 +9,8 @@
 import { state } from './state.js';
 import { $ } from './dom.js';
 import { getTimezone, getTodayDate } from './utils.js';
-import { showLoading, onApiResponse } from './render.js';
+import { showLoading, onApiResponse } from './render.js?v=21';
+import { esajdaLog } from './debug-log.js?v=21';
 
 /** Updates the small status line under the location controls (success / error messages). */
 function setStatus(text, type) {
@@ -102,17 +103,23 @@ export function fetchPrayerTimes() {
     showLoading(true, isUpdating);
     setStatus('');
 
-    const url = 'api.php?' + params.toString();
+    const url = '/api.php?' + params.toString();
     let attempt = 0;
     const maxAttempts = 3;
 
     /** Single attempt + retry logic for the PHP endpoint. */
     function doFetch() {
         attempt += 1;
+        esajdaLog('api', 'GET /api.php (prayer times)', { attempt, url });
         fetch(url, { method: 'GET' })
             .then((res) => res.json().catch(() => ({ success: false, error: 'Invalid response from server.' })).then((json) => ({ res, json })))
             .then(({ res, json }) => {
                 if (res.ok) {
+                    const cacheHdr = res.headers.get('X-Esajda-Cache');
+                    esajdaLog('api', '/api.php OK', {
+                        status: res.status,
+                        serverCache: cacheHdr || 'unknown (hit=SQLite, miss=Aladhan+fresh, bypass=no DB)'
+                    });
                     showLoading(false);
                     onApiResponse(json);
                     return;
@@ -140,6 +147,7 @@ export function fetchPrayerTimes() {
     /** Last resort: browser → Aladhan API (same query shape as PHP would use). */
     function tryDirectAladhan() {
         const directUrl = buildAladhanUrl();
+        esajdaLog('api', 'GET Aladhan direct (fallback)', { url: directUrl });
         fetch(directUrl, { method: 'GET' })
             .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
             .then((result) => {

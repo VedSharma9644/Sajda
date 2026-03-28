@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isha Prayer Times | e-Sajda</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body data-prayer="isha">
+    <div class="app">
+        <header class="header">
+            <h1 class="logo">e-Sajda</h1>
+            <p class="tagline">Prayer Detail Page</p>
+        </header>
+        <main class="main prayer-page-main">
+            <p class="breadcrumbs">Home / <span id="crumb-city">City</span> / Prayer Times / <span id="crumb-prayer">Isha Prayer Times</span></p>
+            <div class="prayer-top-actions card">
+                <span>⚙ Calculation Settings</span>
+                <span>🔗 Share Page</span>
+            </div>
+            <section class="card prayer-page-card">
+                <div class="prayer-page-top">
+                    <div>
+                        <h2 id="hero-title">Isha Prayer Time Today</h2>
+                        <p class="prayer-page-city" id="page-city">—</p>
+                    </div>
+                    <div class="method-select-wrap">
+                        <label for="method-select">Calculation method</label>
+                        <select id="method-select">
+                            <option value="4" selected>Umm Al-Qura University, Makkah</option>
+                            <option value="1">University of Islamic Sciences, Karachi</option>
+                            <option value="3">MWL (Muslim World League)</option>
+                            <option value="2">ISNA</option>
+                        </select>
+                    </div>
+                </div>
+                <p id="hero-time" class="hero-time">--:--</p>
+                <div class="hero-badges">
+                    <p id="tomorrow-shift" class="hero-badge hidden"></p>
+                    <p id="time-status" class="hero-badge hidden"></p>
+                </div>
+                <div id="prayer-tabs" class="prayer-tabs"></div>
+                <div id="daily-times" class="daily-times"></div>
+            </section>
+            <section class="card prayer-page-card">
+                <h3>Prayer guidance</h3>
+                <p><strong>Niyyah:</strong> <span id="niyyah"></span></p>
+                <div class="rakat-grid">
+                    <div><span class="k">Sunnah</span><span id="sunnah-count" class="v">—</span></div>
+                    <div><span class="k">Fard</span><span id="fard-count" class="v">—</span></div>
+                </div>
+                <p><strong>Calculation authority:</strong> <span id="method-name">—</span></p>
+            </section>
+            <section class="card prayer-page-card">
+                <h3>7-Day Isha schedule</h3>
+                <div class="table-wrap">
+                    <table class="prayer-table">
+                        <thead>
+                            <tr><th>Date</th><th>Hijri</th><th>Time</th></tr>
+                        </thead>
+                        <tbody id="seven-day-body"></tbody>
+                    </table>
+                </div>
+            </section>
+            <p id="page-error" class="status error"></p>
+        </main>
+    </div>
+    <script src="/js/prayer-page.js?v=9" type="module"></script>
+</body>
+</html>

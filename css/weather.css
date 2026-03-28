@@ -1,0 +1,88 @@
+/* ----- Weather widget ----- */
+.weather-section {
+    margin-top: 1rem;
+}
+
+.weather-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+}
+
+.weather-head h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.weather-head p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.weather-status {
+    margin: 0.35rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+}
+
+.weather-main {
+    margin-top: 0.8rem;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 0.9rem 1rem;
+}
+
+.weather-primary {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.8rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-input);
+}
+
+.weather-icon {
+    font-size: 2rem;
+}
+
+.weather-temp {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.weather-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.55rem;
+}
+
+.weather-meta-grid p {
+    margin: 0;
+    padding: 0.55rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-input);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.86rem;
+}
+
+.weather-meta-grid span {
+    color: var(--text-secondary);
+}
+
+.weather-meta-grid strong {
+    font-variant-numeric: tabular-nums;
+}
+
+.weather-minmax {
+    margin: 0.65rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.86rem;
+}

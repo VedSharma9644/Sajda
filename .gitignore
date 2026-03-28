@@ -14,3 +14,7 @@ Desktop.ini
 
 # Logs
 *.log
+
+# Runtime SQLite cache (schema/code lives in database/cache-db.php)
+database/cache.db
+database/prayer-cache/

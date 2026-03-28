@@ -11,6 +11,10 @@ import { $, show, hide } from './dom.js';
 import { getDisplayLocation } from './utils.js';
 import { updateMethodRecommendation } from './recommendations.js';
 import { updateNextPrayerUI, startNextPrayerTick, stopNextPrayerTick } from './next-prayer.js';
+import { buildPrayerUrl, readPrayerFromUrl } from './location-routing.js';
+import { renderPrayerDetailPage, hidePrayerDetailPage, isPrayerDetailRoute } from './prayer-detail.js';
+import { startClockWidget, startLocalClockWidget } from './clock-widget.js';
+import { refreshWeatherWidget, hideWeatherWidget } from './weather-widget.js?v=21';
 
 /** Status line under location controls (`success` / `error` add CSS classes). */
 export function setStatus(text, type) {
@@ -56,6 +60,9 @@ export function showError(msg) {
     show(resultsSection);
     hide(todayTimings);
     hide(monthTimings);
+    hidePrayerDetailPage();
+    startLocalClockWidget();
+    hideWeatherWidget();
 }
 
 /** Hides the global error message element. */
@@ -88,6 +95,9 @@ export function renderToday(data) {
     resultsMeta.textContent = dateReadable + (tz ? ' · Times in: ' + tz : '');
 
     setResultsContext(getDisplayLocation(), meta && meta.method && meta.method.name ? meta.method.name : '—');
+    if (tz) startClockWidget(getDisplayLocation(), tz);
+    else startLocalClockWidget();
+    refreshWeatherWidget();
     updateMethodRecommendation();
 
     const methodTip = $('results-method-tip');
@@ -103,9 +113,12 @@ export function renderToday(data) {
         }
     }
 
+    const routePrayer = readPrayerFromUrl();
     prayerList.innerHTML = PRAYERS.map((name) => {
         const time = timings[name] || '--:--';
-        return '<li data-prayer="' + name + '"><span class="name">' + name + '</span><span class="time">' + time + '</span></li>';
+        const href = buildPrayerUrl(state.currentAddress || getDisplayLocation(), name);
+        const activeClass = routePrayer === name.toLowerCase() ? ' prayer-link-active' : '';
+        return '<li data-prayer="' + name + '"><a class="prayer-link' + activeClass + '" href="' + href + '"><span class="name">' + name + '</span><span class="time">' + time + '</span></a></li>';
     }).join('');
 
     updateNextPrayerUI();
@@ -116,6 +129,8 @@ export function renderToday(data) {
     hide(monthTimings);
     hide($('comparison-panel'));
     clearError();
+    if (isPrayerDetailRoute()) renderPrayerDetailPage(data);
+    else hidePrayerDetailPage();
 }
 
 /** Calendar month: builds a table of rows; stops the next-prayer tick (not meaningful for a month). */
@@ -152,6 +167,9 @@ export function renderMonth(data) {
     resultsMeta.textContent = meta && meta.timezone ? 'Times in: ' + meta.timezone : '';
 
     setResultsContext(getDisplayLocation(), meta && meta.method && meta.method.name ? meta.method.name : '—');
+    if (meta && meta.timezone) startClockWidget(getDisplayLocation(), meta.timezone);
+    else startLocalClockWidget();
+    refreshWeatherWidget();
     updateMethodRecommendation();
 
     const rows = arr.map((day) => {
@@ -176,6 +194,7 @@ export function renderMonth(data) {
     hide(todayTimings);
     show(monthTimings);
     clearError();
+    hidePrayerDetailPage();
 }
 
 /**

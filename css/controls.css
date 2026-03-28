@@ -1,0 +1,264 @@
+/* ----- Controls ----- */
+.controls h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.location-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    font-family: var(--font);
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+}
+
+.btn-secondary {
+    background: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+    background: #2d3d4f;
+}
+
+.or {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.city-input-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 200px;
+}
+
+.city-input-autocomplete {
+    position: relative;
+    flex: 1;
+    min-width: 180px;
+}
+
+.city-input-wrap input {
+    width: 100%;
+    min-width: 0;
+}
+
+.suggestions-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 2px;
+    max-height: 220px;
+    overflow-y: auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow);
+    z-index: 100;
+}
+
+.suggestions-dropdown.hidden {
+    display: none !important;
+}
+
+.suggestion-item {
+    display: block;
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    font-family: var(--font);
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.suggestion-item:hover,
+.suggestion-item[aria-selected="true"] {
+    background: var(--bg-input);
+}
+
+.suggestion-item:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+}
+
+.suggestions-dropdown .suggestion-loading {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.suggestions-dropdown .suggestion-empty {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.status {
+    margin: 0.5rem 0 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.status.success {
+    color: var(--success);
+}
+
+.status.error {
+    color: var(--error);
+}
+
+/* ----- Form groups ----- */
+.options-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1.25rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.method-recommendation {
+    margin: 0.4rem 0 0;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.method-recommendation strong {
+    color: var(--accent);
+}
+
+.btn-why-method {
+    display: inline-block;
+    margin: 0.35rem 0 0;
+    padding: 0;
+    font-family: var(--font);
+    font-size: 0.8rem;
+    color: var(--accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.btn-why-method:hover {
+    color: var(--accent-hover);
+}
+
+.btn-why-method:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.why-method-content {
+    margin: 0.5rem 0 0;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    background: var(--bg-input);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--accent);
+}
+
+.why-method-content.hidden {
+    display: none !important;
+}
+
+.why-method-content p {
+    margin: 0;
+}
+
+.method-tip {
+    margin: 0.5rem 0 0;
+    font-size: 0.85rem;
+    color: var(--accent);
+    line-height: 1.4;
+}
+
+.method-tip.hidden {
+    display: none !important;
+}
+
+select,
+input[type="text"] {
+    padding: 0.6rem 0.75rem;
+    font-family: var(--font);
+    font-size: 0.9rem;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+}
+
+select:focus,
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-muted);
+}
+
+input[type="text"]::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.8;
+}
+
+.month-picker {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.month-picker.hidden {
+    display: none !important;
+}
