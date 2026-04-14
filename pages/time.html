@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('esajda.theme') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) { /* ignore */ }
+        })();
+    </script>
+    <title>Local time | e-Sajda</title>
+    <meta name="description" content="Clock and timezone for your city.">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/style.css?v=30">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+</head>
+<body>
+    <div class="app">
+        <header class="site-header" role="banner">
+            <div class="site-header-breadcrumbs">
+                <div class="site-header-breadcrumbs-inner">
+                    <nav id="site-breadcrumbs" class="site-breadcrumbs" aria-label="Breadcrumb"></nav>
+                    <div class="site-header-right">
+                        <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
+                            <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+                            <span class="theme-toggle-label">Dark mode</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <nav id="site-tabs" class="site-tabs" aria-label="Sections"></nav>
+        </header>
+        <main class="main prayer-page-main">
+            <section class="controls card site-location-strip" aria-label="Choose location">
+                <div class="location-section">
+                    <h2>Location</h2>
+                    <div class="location-actions">
+                        <button type="button" id="btn-use-location" class="btn btn-primary">
+                            <span class="btn-icon">📍</span> Use my location
+                        </button>
+                        <span class="or">or</span>
+                        <div class="city-input-wrap">
+                            <div class="city-input-autocomplete">
+                                <input type="text" id="input-city" placeholder="City, Country (e.g. London, UK)" autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions-dropdown" role="combobox" aria-label="City search">
+                                <div id="suggestions-dropdown" class="suggestions-dropdown hidden" role="listbox" aria-label="Location suggestions"></div>
+                            </div>
+                            <button type="button" id="btn-search-city" class="btn btn-secondary">Search</button>
+                        </div>
+                    </div>
+                    <p id="location-status" class="status" aria-live="polite"></p>
+                </div>
+            </section>
+            <div class="time-page-head">
+                <h1 id="time-page-heading" class="time-page-title">Local time</h1>
+            </div>
+
+            <div class="time-page-grid">
+                <section id="clock-section" class="clock-section card hidden">
+                    <div class="clock-head">
+                        <h3>Current time now</h3>
+                        <p id="clock-location"></p>
+                    </div>
+                    <div class="clock-main-row">
+                        <div class="clock-digital">
+                            <span id="clock-hour">--</span>
+                            <span class="sep">:</span>
+                            <span id="clock-minute">--</span>
+                            <span class="sep">:</span>
+                            <span id="clock-second">--</span>
+                        </div>
+                        <div class="clock-analog-wrap" aria-label="Analog clock">
+                            <div class="clock-analog-face">
+                                <span class="mark m12"></span>
+                                <span class="mark m1"></span>
+                                <span class="mark m2"></span>
+                                <span class="mark m3"></span>
+                                <span class="mark m4"></span>
+                                <span class="mark m5"></span>
+                                <span class="mark m6"></span>
+                                <span class="mark m7"></span>
+                                <span class="mark m8"></span>
+                                <span class="mark m9"></span>
+                                <span class="mark m10"></span>
+                                <span class="mark m11"></span>
+                                <span id="clock-hand-hour" class="clock-hand hour"></span>
+                                <span id="clock-hand-minute" class="clock-hand minute"></span>
+                                <span id="clock-hand-second" class="clock-hand second"></span>
+                                <span class="clock-center-dot"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <p id="clock-date" class="clock-date"></p>
+                    <p id="clock-tzline" class="clock-timezone"></p>
+                    <p id="clock-timezone" class="clock-timezone"></p>
+                    <div class="clock-controls">
+                        <button type="button" id="clock-btn-24" class="clock-btn active">24-hour</button>
+                        <button type="button" id="clock-btn-12" class="clock-btn">12-hour</button>
+                        <button type="button" id="clock-btn-fullscreen" class="clock-btn">Fullscreen</button>
+                        <span id="clock-mode" class="clock-mode">24-hour</span>
+                    </div>
+                </section>
+
+                <section id="time-glance" class="card hidden" aria-label="At a glance">
+                    <div class="card-head">
+                        <h3 class="card-title">At a glance</h3>
+                        <p class="card-subtitle">Quick timezone and location facts</p>
+                    </div>
+                    <div class="time-glance-grid" aria-label="Key facts">
+                        <div class="time-glance-item">
+                            <div class="k">IANA Timezone</div>
+                            <div class="v mono" id="glance-iana">—</div>
+                        </div>
+                        <div class="time-glance-item">
+                            <div class="k">UTC Offset</div>
+                            <div class="v mono" id="glance-offset">—</div>
+                        </div>
+                        <div class="time-glance-item">
+                            <div class="k">Timezone</div>
+                            <div class="v" id="glance-abbr">—</div>
+                        </div>
+                        <div class="time-glance-item">
+                            <div class="k">Daylight Saving</div>
+                            <div class="v" id="glance-dst">—</div>
+                        </div>
+                        <div class="time-glance-item">
+                            <div class="k">Region</div>
+                            <div class="v" id="glance-region">—</div>
+                        </div>
+                        <div class="time-glance-item">
+                            <div class="k">Lat/Long</div>
+                            <div class="v" id="glance-latlong">—</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="time-map-section" class="card hidden" aria-label="Map">
+                    <div class="card-head">
+                        <h3 class="card-title">Map</h3>
+                        <p id="time-map-caption" class="card-subtitle"></p>
+                    </div>
+                    <div id="time-map" class="time-map" role="application" aria-label="Location map"></div>
+                </section>
+
+                <section id="time-country-info" class="card hidden" aria-label="Country info">
+                    <div class="card-head">
+                        <h3 class="card-title" id="time-country-title">Country info</h3>
+                        <p id="time-country-sub" class="card-subtitle"></p>
+                    </div>
+                    <div class="results-grid time-country-grid">
+                        <div class="result">
+                            <div class="label">Capital city</div>
+                            <div class="value" id="time-capital">—</div>
+                        </div>
+                        <div class="result">
+                            <div class="label">ISO Alpha 2/3</div>
+                            <div class="value" id="time-iso">—</div>
+                        </div>
+                        <div class="result">
+                            <div class="label">Time zones</div>
+                            <div class="value" id="time-country-timezones"></div>
+                        </div>
+                        <div class="result">
+                            <div class="label">Population</div>
+                            <div class="value" id="time-country-pop">—</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="time-details" class="card hidden">
+                    <div class="card-head">
+                        <h3 class="card-title">Time details</h3>
+                        <p id="time-details-sub" class="card-subtitle"></p>
+                    </div>
+                    <div class="results-grid" style="grid-template-columns: 1fr; gap: 0.5rem">
+                        <div class="result">
+                            <div class="label">Lat/Long</div>
+                            <div class="value" id="time-latlong">—</div>
+                        </div>
+                        <div class="result">
+                            <div class="label">Region</div>
+                            <div class="value" id="time-region">—</div>
+                        </div>
+                        <div class="result">
+                            <div class="label">Country</div>
+                            <div class="value" id="time-country">—</div>
+                        </div>
+                        <div class="result">
+                            <div class="label">IANA Timezone</div>
+                            <div class="value" id="time-iana">—</div>
+                        </div>
+                        <div class="result">
+                            <div class="label">UTC Offset</div>
+                            <div class="value" id="time-utc-offset">—</div>
+                        </div>
+                        <div class="result">
+                            <div class="label">Timezone</div>
+                            <div class="value" id="time-tz-label">—</div>
+                        </div>
+                        <div class="result">
+                            <div class="label">Daylight Saving Time</div>
+                            <div class="value" id="time-dst">—</div>
+                        </div>
+                        <div class="result">
+                            <div class="label">Standard Timezone Abbreviations</div>
+                            <div class="value" id="time-std-abbr">—</div>
+                        </div>
+                        <div class="result">
+                            <div class="label">Daylight Saving Timezone Abbreviations</div>
+                            <div class="value" id="time-dst-abbr">—</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <section id="country-cities" class="card hidden" aria-label="Major cities in country">
+                <div class="card-head">
+                    <h3 class="card-title" id="country-cities-title">Major cities in country</h3>
+                    <p id="country-cities-sub" class="card-subtitle"></p>
+                </div>
+                <div id="country-cities-list" class="time-other-cities-list" aria-label="Major cities in country list"></div>
+            </section>
+
+            <section id="major-cities" class="card hidden" aria-label="Major cities">
+                <div class="card-head">
+                    <h3 class="card-title" id="major-cities-title">Major cities</h3>
+                    <p id="major-cities-sub" class="card-subtitle"></p>
+                </div>
+                <div id="major-cities-list" class="time-other-cities-list" aria-label="Major cities list"></div>
+            </section>
+            <p id="time-page-error" class="status error hidden">Could not resolve the timezone for this place.</p>
+        </main>
+    </div>
+    <script src="/js/site-header-nav.js?v=3" type="module"></script>
+    <script src="/js/site-location-panel.js?v=1" type="module"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="/js/time-page.js?v=3" type="module"></script>
+</body>
+</html>

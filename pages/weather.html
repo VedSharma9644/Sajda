@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('esajda.theme') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) { /* ignore */ }
+        })();
+    </script>
+    <title>Weather | e-Sajda</title>
+    <meta name="description" content="Current weather for your city.">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/style.css?v=39">
+</head>
+<body>
+    <div class="app">
+        <header class="site-header" role="banner">
+            <div class="site-header-breadcrumbs">
+                <div class="site-header-breadcrumbs-inner">
+                    <nav id="site-breadcrumbs" class="site-breadcrumbs" aria-label="Breadcrumb"></nav>
+                    <div class="site-header-right">
+                        <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
+                            <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+                            <span class="theme-toggle-label">Dark mode</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <nav id="site-tabs" class="site-tabs" aria-label="Sections"></nav>
+        </header>
+        <main class="main prayer-page-main">
+            <section class="controls card site-location-strip" aria-label="Choose location">
+                <div class="location-section">
+                    <h2>Location</h2>
+                    <div class="location-actions">
+                        <button type="button" id="btn-use-location" class="btn btn-primary">
+                            <span class="btn-icon">📍</span> Use my location
+                        </button>
+                        <span class="or">or</span>
+                        <div class="city-input-wrap">
+                            <div class="city-input-autocomplete">
+                                <input type="text" id="input-city" placeholder="City, Country (e.g. London, UK)" autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions-dropdown" role="combobox" aria-label="City search">
+                                <div id="suggestions-dropdown" class="suggestions-dropdown hidden" role="listbox" aria-label="Location suggestions"></div>
+                            </div>
+                            <button type="button" id="btn-search-city" class="btn btn-secondary">Search</button>
+                        </div>
+                    </div>
+                    <p id="location-status" class="status" aria-live="polite"></p>
+                </div>
+            </section>
+            <h2 id="weather-page-heading" class="prayer-page-card" style="margin:0 0 0.5rem;font-size:1.1rem">Weather</h2>
+            <section id="weather-section" class="weather-section card hidden">
+                <div class="weather-head">
+                    <h3 class="weather-title">Current weather in <span id="weather-location">—</span></h3>
+                </div>
+                <p id="weather-status" class="weather-status">Loading…</p>
+                <div class="weather-hero">
+                    <span id="weather-icon" class="weather-hero-icon" aria-hidden="true">🌤️</span>
+                    <div class="weather-hero-body">
+                        <div id="weather-temp" class="weather-hero-temp">—°C</div>
+                        <p id="weather-subline" class="weather-subline">—</p>
+                    </div>
+                </div>
+                <div class="weather-detail-grid" aria-label="Weather details">
+                    <div class="weather-detail-cell">
+                        <span class="weather-detail-ico" aria-hidden="true">💨</span>
+                        <span id="weather-wind-line" class="weather-detail-text weather-detail-val">—</span>
+                    </div>
+                    <div class="weather-detail-cell">
+                        <span class="weather-detail-ico" aria-hidden="true">💧</span>
+                        <span id="weather-humidity-line" class="weather-detail-text weather-detail-val">—</span>
+                    </div>
+                    <div class="weather-detail-cell">
+                        <span class="weather-detail-ico" aria-hidden="true">🧭</span>
+                        <span id="weather-pressure-line" class="weather-detail-text weather-detail-val">—</span>
+                    </div>
+                    <div class="weather-detail-cell">
+                        <span class="weather-detail-ico" aria-hidden="true">👁️</span>
+                        <span id="weather-visibility-line" class="weather-detail-text weather-detail-val">—</span>
+                    </div>
+                    <div class="weather-detail-cell">
+                        <span class="weather-detail-ico" aria-hidden="true">☀️</span>
+                        <span id="weather-uv-line" class="weather-detail-text weather-detail-val">—</span>
+                    </div>
+                    <div class="weather-detail-cell">
+                        <span class="weather-detail-ico" aria-hidden="true">🌡️</span>
+                        <span id="weather-dew-line" class="weather-detail-text weather-detail-val">—</span>
+                    </div>
+                    <div class="weather-detail-cell">
+                        <span class="weather-detail-ico" aria-hidden="true">🌅</span>
+                        <div class="weather-detail-text weather-detail-val">
+                            <a id="weather-sunrise-link" class="weather-sun-link" href="#">Sunrise</a>
+                            <span> : </span><span id="weather-sunrise-time">—</span>
+                        </div>
+                    </div>
+                    <div class="weather-detail-cell">
+                        <span class="weather-detail-ico" aria-hidden="true">🌇</span>
+                        <div class="weather-detail-text weather-detail-val">
+                            <a id="weather-sunset-link" class="weather-sun-link" href="#">Sunset</a>
+                            <span> : </span><span id="weather-sunset-time">—</span>
+                        </div>
+                    </div>
+                </div>
+                <p id="weather-minmax" class="weather-minmax"></p>
+            </section>
+
+            <section id="weather-hourly-section" class="weather-hourly-section card hidden" aria-labelledby="weather-hourly-title">
+                <h3 id="weather-hourly-title" class="weather-hourly-title">Hourly forecast</h3>
+                <div
+                    class="weather-hourly-scroll-wrap"
+                    tabindex="0"
+                    role="region"
+                    aria-label="Hourly forecast — scroll sideways"
+                >
+                    <div id="weather-hourly-scroll" class="weather-hourly-scroll" role="list" aria-label="Hours"></div>
+                </div>
+            </section>
+
+            <section id="weather-daily-section" class="weather-daily-section card hidden" aria-labelledby="weather-daily-title">
+                <h3 id="weather-daily-title" class="weather-daily-title">14-day forecast</h3>
+                <div id="weather-daily-grid" class="weather-daily-grid"></div>
+            </section>
+
+            <section id="weather-extras-section" class="weather-extras-section card hidden" aria-labelledby="weather-extras-title">
+                <h3 id="weather-extras-title" class="weather-extras-title">Additional forecasts</h3>
+                <p class="weather-extras-disclaimer">
+                    Marine and sea-level highs/lows use Open-Meteo’s ocean grid—often empty far inland. Model output only; not for navigation. Air quality from CAMS / Open-Meteo.
+                </p>
+                <div id="weather-extras-grid" class="weather-extras-grid"></div>
+            </section>
+
+            <section id="major-cities" class="card hidden" aria-label="Major cities">
+                <div class="card-head">
+                    <h3 class="card-title" id="major-cities-title">Major cities</h3>
+                    <p class="card-subtitle" id="major-cities-sub"></p>
+                </div>
+                <div id="major-cities-list" class="time-other-cities-list" aria-label="Major cities list"></div>
+            </section>
+
+            <section id="country-cities" class="card hidden" aria-label="Major cities in country">
+                <div class="card-head">
+                    <h3 class="card-title" id="country-cities-title">Major cities in country</h3>
+                    <p class="card-subtitle" id="country-cities-sub"></p>
+                </div>
+                <div id="country-cities-list" class="time-other-cities-list" aria-label="Major cities in country list"></div>
+            </section>
+            <p id="weather-page-error" class="status error hidden">Could not load weather for this place.</p>
+        </main>
+    </div>
+    <script src="/js/site-header-nav.js?v=3" type="module"></script>
+    <script src="/js/site-location-panel.js?v=1" type="module"></script>
+    <script src="/js/weather-page.js?v=7" type="module"></script>
+</body>
+</html>

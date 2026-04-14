@@ -83,6 +83,18 @@ function summarizePayload($payloadJson) {
         return $summary;
     }
 
+    if (is_array($data) && isset($data['labels']) && isset($data['sunriseMin']) && isset($data['sunsetMin'])) {
+        $summary['type'] = 'sun_year';
+        $summary['items'] = (isset($data['dayCount']) ? (string)$data['dayCount'] : (string)count($data['labels'])) . ' days';
+        return $summary;
+    }
+
+    if (is_array($data) && isset($data['latitude']) && isset($data['longitude']) && !isset($data['temperature'])) {
+        $summary['type'] = 'geocode';
+        $summary['items'] = '1 result';
+        return $summary;
+    }
+
     if (is_array($data) && isset($data[0])) {
         $summary['type'] = 'month';
         $summary['items'] = count($data) . ' rows';

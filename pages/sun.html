@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('esajda.theme') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) { /* ignore */ }
+        })();
+    </script>
+    <title>Sun & twilight | e-Sajda</title>
+    <meta name="description" content="Sunrise, sunset, yearly chart, and sun path for your location.">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/style.css?v=32">
+</head>
+<body>
+    <div class="app">
+        <header class="site-header" role="banner">
+            <div class="site-header-breadcrumbs">
+                <div class="site-header-breadcrumbs-inner">
+                    <nav id="site-breadcrumbs" class="site-breadcrumbs" aria-label="Breadcrumb"></nav>
+                    <div class="site-header-right">
+                        <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
+                            <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+                            <span class="theme-toggle-label">Dark mode</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <nav id="site-tabs" class="site-tabs" aria-label="Sections"></nav>
+        </header>
+        <main class="main prayer-page-main">
+            <section class="controls card site-location-strip" aria-label="Choose location">
+                <div class="location-section">
+                    <h2>Location</h2>
+                    <div class="location-actions">
+                        <button type="button" id="btn-use-location" class="btn btn-primary">
+                            <span class="btn-icon">📍</span> Use my location
+                        </button>
+                        <span class="or">or</span>
+                        <div class="city-input-wrap">
+                            <div class="city-input-autocomplete">
+                                <input type="text" id="input-city" placeholder="City, Country (e.g. London, UK)" autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions-dropdown" role="combobox" aria-label="City search">
+                                <div id="suggestions-dropdown" class="suggestions-dropdown hidden" role="listbox" aria-label="Location suggestions"></div>
+                            </div>
+                            <button type="button" id="btn-search-city" class="btn btn-secondary">Search</button>
+                        </div>
+                    </div>
+                    <p id="location-status" class="status" aria-live="polite"></p>
+                </div>
+            </section>
+            <h2 id="sun-page-heading" class="prayer-page-card" style="margin:0 0 0.5rem;font-size:1.1rem">Sun &amp; twilight</h2>
+
+            <section id="sun-times-section" class="sun-times-section sun-times-strip-card card hidden" aria-labelledby="sun-times-heading">
+                <div class="sun-times-head">
+                    <h3 id="sun-times-heading" class="sun-times-title">Sunrise &amp; Sunset Times for <span id="sun-times-place">—</span></h3>
+                </div>
+                <ul class="sun-times-list" id="sun-times-list" aria-label="Sunrise and sunset times"></ul>
+            </section>
+
+            <div id="yearly-sun-chart-section" class="yearly-sun-chart-section card hidden">
+                <h3 class="yearly-sun-chart-title">Sun through the year</h3>
+                <p class="yearly-sun-chart-caption">One point per calendar day. Hover a day for sunrise, sunset, and twilight times.</p>
+                <div class="sun-graph-container">
+                    <div id="sunGraphLoader" class="sun-graph-loader hidden" role="status" aria-live="polite">
+                        <div class="spinner" aria-hidden="true"></div>
+                        <p>Loading sun data…</p>
+                    </div>
+                    <canvas id="yearlySunChart" aria-label="Yearly sunrise and sunset chart"></canvas>
+                </div>
+            </div>
+
+            <div id="daily-sun-bar-section" class="daily-sun-bar-section card hidden" aria-label="Today's Sun Phases">
+                <h3 class="daily-sun-bar-heading" id="dailySunBarHeading">Today's Sun Phases</h3>
+                <div class="daily-sun-bar-container">
+                    <div class="daily-sun-bar-date" id="dailySunBarDateDisplay">—</div>
+                    <div class="sun-bar-segments-wrapper">
+                        <div class="daily-sun-bar" id="dailySunBar" aria-hidden="true"></div>
+                        <div class="solar-noon-marker hidden" id="solarNoonMarker" aria-hidden="true"></div>
+                    </div>
+                </div>
+                <div class="daily-sun-bar-legend" id="dailySunBarLegend" aria-label="Sun phase legend"></div>
+            </div>
+
+            <div id="daily-sun-progression-section" class="daily-sun-progression-section card hidden" aria-label="Sun path today">
+                <h3 class="daily-sun-progression-heading">
+                    Sun's Path on <span id="dailyProgressionChartDate">—</span> in <span id="dailyProgressionChartCity">—</span>
+                </h3>
+                <div class="daily-sun-progression-container">
+                    <div class="daily-chart-wrapper">
+                        <canvas id="dailySunAltitudeChart" aria-label="Sun altitude chart"></canvas>
+                    </div>
+                    <div id="dailySunInfoPanel" class="daily-sun-info-panel">
+                        <div id="panelTime" class="panel-time">—</div>
+                        <div><strong>Altitude:</strong> <span id="panelAltitude">—</span></div>
+                        <div><strong>Heading:</strong> <span id="panelHeading">—</span></div>
+                        <div><strong>Position:</strong> <span id="panelPosition">—</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <section id="major-cities" class="card hidden" aria-label="Major cities">
+                <div class="card-head">
+                    <h3 class="card-title" id="major-cities-title">Major cities</h3>
+                    <p class="card-subtitle" id="major-cities-sub"></p>
+                </div>
+                <div id="major-cities-list" class="time-other-cities-list" aria-label="Major cities list"></div>
+            </section>
+
+            <section id="country-cities" class="card hidden" aria-label="Major cities in country">
+                <div class="card-head">
+                    <h3 class="card-title" id="country-cities-title">Major cities in country</h3>
+                    <p class="card-subtitle" id="country-cities-sub"></p>
+                </div>
+                <div id="country-cities-list" class="time-other-cities-list" aria-label="Major cities in country list"></div>
+            </section>
+
+            <section id="sun-month-calendar-section" class="sun-month-calendar-section card hidden" aria-labelledby="sun-month-calendar-title">
+                <div class="sun-month-calendar-toolbar">
+                    <h3 id="sun-month-calendar-title" class="sun-month-calendar-title">Monthly sun calendar</h3>
+                    <div class="sun-month-calendar-controls" role="group" aria-label="Sun table options">
+                        <label class="sun-month-calendar-label">
+                            <span class="sun-month-calendar-label-text">View</span>
+                            <select id="sun-month-range-select" class="sun-month-calendar-select" aria-label="Table range"></select>
+                        </label>
+                        <label class="sun-month-calendar-label">
+                            <span class="sun-month-calendar-label-text">Month</span>
+                            <select id="sun-month-select" class="sun-month-calendar-select" aria-label="Month"></select>
+                        </label>
+                        <label class="sun-month-calendar-label">
+                            <span class="sun-month-calendar-label-text">Year</span>
+                            <select id="sun-year-select" class="sun-month-calendar-select" aria-label="Year"></select>
+                        </label>
+                        <button type="button" id="sun-month-view-btn" class="btn btn-primary">View sun data</button>
+                    </div>
+                </div>
+                <p id="sun-month-calendar-error" class="status error hidden" role="alert"></p>
+                <div class="sun-month-table-scroll">
+                    <table class="sun-month-table" id="sun-month-table" aria-describedby="sun-month-calendar-title"></table>
+                </div>
+            </section>
+
+            <p id="sun-page-error" class="status error hidden">Could not load sun data for this place.</p>
+        </main>
+    </div>
+    <script src="/js/site-header-nav.js?v=3" type="module"></script>
+    <script src="/js/site-location-panel.js?v=1" type="module"></script>
+    <script src="/js/sun-page.js?v=4" type="module"></script>
+</body>
+</html>

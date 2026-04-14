@@ -9,8 +9,93 @@
 import { state } from './state.js';
 import { $ } from './dom.js';
 import { getTimezone, getTodayDate } from './utils.js';
-import { showLoading, onApiResponse } from './render.js?v=24';
+import { showLoading, onApiResponse } from './render.js?v=25';
 import { esajdaLog } from './debug-log.js?v=21';
+
+function readAllMethodIdsFromDom() {
+    const sel = $('select-method');
+    if (!sel) return [];
+    const ids = [];
+    for (const opt of Array.from(sel.querySelectorAll('option'))) {
+        const v = String(opt.value || '').trim();
+        if (v && /^\d+$/.test(v)) ids.push(v);
+    }
+    // de-dupe, stable order
+    return Array.from(new Set(ids));
+}
+
+function prefetchSignatureFromParams(params) {
+    // Signature for "same city/date/view" regardless of selected method.
+    const p = new URLSearchParams(params.toString());
+    p.delete('method');
+    // Keep it short but stable; SHA1 not needed here.
+    return p.toString();
+}
+
+function shouldPrefetchNow(signature) {
+    const key = 'esajda.prefetch.methods.v1:' + signature;
+    const now = Date.now();
+    try {
+        const raw = localStorage.getItem(key);
+        const last = raw ? Number(raw) : 0;
+        // Re-prefetch at most once per 24h for the same signature.
+        if (last && Number.isFinite(last) && now - last < 24 * 60 * 60 * 1000) return false;
+        localStorage.setItem(key, String(now));
+        return true;
+    } catch (_) {
+        // If storage is unavailable, still prefetch once per session.
+        return true;
+    }
+}
+
+function prefetchOtherMethodsInBackground(baseParams) {
+    try {
+        const action = baseParams.get('action') || 'today';
+        if (action !== 'today') return; // month prefetch is heavy; can add later if needed
+
+        const signature = prefetchSignatureFromParams(baseParams);
+        if (!shouldPrefetchNow(signature)) return;
+
+        const all = readAllMethodIdsFromDom();
+        const current = String(baseParams.get('method') || '');
+        const others = all.filter((m) => m !== current);
+        if (!others.length) return;
+
+        // Limit to avoid hammering upstream. Order: nearby/common methods first.
+        const maxPrefetch = 8;
+        const list = others.slice(0, maxPrefetch);
+
+        let idx = 0;
+        const concurrency = 2;
+        let inFlight = 0;
+
+        function next() {
+            while (inFlight < concurrency && idx < list.length) {
+                const method = list[idx++];
+                const p = new URLSearchParams(baseParams.toString());
+                p.set('method', method);
+                const url = '/api.php?' + p.toString();
+                inFlight += 1;
+                esajdaLog('api', 'prefetch /api.php (method cache warm)', { method, url });
+                fetch(url, { method: 'GET' })
+                    .then(() => {
+                        // Intentionally ignore body; server cache is what we care about.
+                    })
+                    .catch(() => {
+                        /* ignore prefetch failures */
+                    })
+                    .finally(() => {
+                        inFlight -= 1;
+                        next();
+                    });
+            }
+        }
+
+        next();
+    } catch (_) {
+        // Never let prefetch break primary flow.
+    }
+}
 
 /** Updates the small status line under the location controls (success / error messages). */
 function setStatus(text, type) {
@@ -122,6 +207,8 @@ export function fetchPrayerTimes() {
                     });
                     showLoading(false);
                     onApiResponse(json);
+                    // Warm method cache in the background so switching methods is instant.
+                    prefetchOtherMethodsInBackground(params);
                     return;
                 }
                 if ((res.status === 502 || res.status === 504) && attempt < maxAttempts) {

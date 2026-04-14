@@ -14,26 +14,34 @@
     </script>
     <title>e-Sajda | Prayer Times</title>
     <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="/style.css?v=27">
+    <link rel="preload" as="style" href="/style.css?v=39">
+    <link rel="stylesheet" href="/style.css?v=39">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://esm.sh" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"></noscript>
 </head>
 <body>
     <div class="app">
-        <header class="header">
-            <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
-                <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
-                <span class="theme-toggle-label">Dark mode</span>
-            </button>
-            <div class="header-brand">
-                <h1 class="logo">e-Sajda</h1>
-                <p class="tagline">Daily Prayer Times</p>
+        <header class="site-header" role="banner">
+            <div class="site-header-breadcrumbs">
+                <div class="site-header-breadcrumbs-inner">
+                    <nav id="site-breadcrumbs" class="site-breadcrumbs" aria-label="Breadcrumb"></nav>
+                    <div class="site-header-right">
+                        <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
+                            <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+                            <span class="theme-toggle-label">Dark mode</span>
+                        </button>
+                    </div>
+                </div>
             </div>
+            <nav id="site-tabs" class="site-tabs" aria-label="Sections"></nav>
         </header>
 
         <main class="main">
-            <section class="controls card">
+            <section class="controls card" id="location-panel">
                 <div class="location-section">
                     <h2>Location</h2>
                     <div class="location-actions">
@@ -155,20 +163,54 @@
             <div id="weather-sunstrip" class="weather-sunstrip hidden">
                 <section id="weather-section" class="weather-section card hidden">
                     <div class="weather-head">
-                        <h3>Current weather</h3>
-                        <p id="weather-location">—</p>
+                        <h3 class="weather-title">Current weather in <span id="weather-location">—</span></h3>
                     </div>
                     <p id="weather-status" class="weather-status">Set a location to see weather.</p>
-                    <div class="weather-main">
-                        <div class="weather-primary">
-                            <span id="weather-icon" class="weather-icon">🌤️</span>
-                            <span id="weather-temp" class="weather-temp">—°C</span>
+                    <div class="weather-hero">
+                        <span id="weather-icon" class="weather-hero-icon" aria-hidden="true">🌤️</span>
+                        <div class="weather-hero-body">
+                            <div id="weather-temp" class="weather-hero-temp">—°C</div>
+                            <p id="weather-subline" class="weather-subline">—</p>
                         </div>
-                        <div class="weather-meta-grid">
-                            <p><span>Feels like</span><strong id="weather-feels">—</strong></p>
-                            <p><span>Humidity</span><strong id="weather-humidity">—</strong></p>
-                            <p><span>Wind</span><strong id="weather-wind">—</strong></p>
-                            <p><span>Rain chance</span><strong id="weather-rain">—</strong></p>
+                    </div>
+                    <div class="weather-detail-grid" aria-label="Weather details">
+                        <div class="weather-detail-cell">
+                            <span class="weather-detail-ico" aria-hidden="true">💨</span>
+                            <span id="weather-wind-line" class="weather-detail-text weather-detail-val">—</span>
+                        </div>
+                        <div class="weather-detail-cell">
+                            <span class="weather-detail-ico" aria-hidden="true">💧</span>
+                            <span id="weather-humidity-line" class="weather-detail-text weather-detail-val">—</span>
+                        </div>
+                        <div class="weather-detail-cell">
+                            <span class="weather-detail-ico" aria-hidden="true">🧭</span>
+                            <span id="weather-pressure-line" class="weather-detail-text weather-detail-val">—</span>
+                        </div>
+                        <div class="weather-detail-cell">
+                            <span class="weather-detail-ico" aria-hidden="true">👁️</span>
+                            <span id="weather-visibility-line" class="weather-detail-text weather-detail-val">—</span>
+                        </div>
+                        <div class="weather-detail-cell">
+                            <span class="weather-detail-ico" aria-hidden="true">☀️</span>
+                            <span id="weather-uv-line" class="weather-detail-text weather-detail-val">—</span>
+                        </div>
+                        <div class="weather-detail-cell">
+                            <span class="weather-detail-ico" aria-hidden="true">🌡️</span>
+                            <span id="weather-dew-line" class="weather-detail-text weather-detail-val">—</span>
+                        </div>
+                        <div class="weather-detail-cell">
+                            <span class="weather-detail-ico" aria-hidden="true">🌅</span>
+                            <div class="weather-detail-text weather-detail-val">
+                                <a id="weather-sunrise-link" class="weather-sun-link" href="#">Sunrise</a>
+                                <span> : </span><span id="weather-sunrise-time">—</span>
+                            </div>
+                        </div>
+                        <div class="weather-detail-cell">
+                            <span class="weather-detail-ico" aria-hidden="true">🌇</span>
+                            <div class="weather-detail-text weather-detail-val">
+                                <a id="weather-sunset-link" class="weather-sun-link" href="#">Sunset</a>
+                                <span> : </span><span id="weather-sunset-time">—</span>
+                            </div>
                         </div>
                     </div>
                     <p id="weather-minmax" class="weather-minmax"></p>
@@ -177,7 +219,6 @@
                 <section id="sun-times-section" class="sun-times-section sun-times-strip-card card hidden" aria-labelledby="sun-times-heading">
                     <div class="sun-times-head">
                         <h2 id="sun-times-heading" class="sun-times-title">Sunrise &amp; Sunset Times for <span id="sun-times-place">—</span></h2>
-                        <span class="sun-times-chevron" aria-hidden="true">›</span>
                     </div>
                     <ul class="sun-times-list" id="sun-times-list" aria-label="Sunrise and sunset times"></ul>
                 </section>
@@ -204,6 +245,47 @@
 
                     <div class="compare-actions">
                         <button type="button" id="btn-compare-karachi" class="btn btn-secondary btn-compare">Compare with Karachi method</button>
+                    </div>
+
+                    <div id="yearly-sun-chart-section" class="yearly-sun-chart-section card hidden">
+                        <h3 class="yearly-sun-chart-title">Sun through the year</h3>
+                        <p class="yearly-sun-chart-caption">One point per calendar day (365 or 366 in a leap year). Hover a day for sunrise/sunset and twilight times (SunCalc + Chart.js).</p>
+                        <div class="sun-graph-container">
+                            <div id="sunGraphLoader" class="sun-graph-loader hidden" role="status" aria-live="polite">
+                                <div class="spinner" aria-hidden="true"></div>
+                                <p>Loading sun data…</p>
+                            </div>
+                            <canvas id="yearlySunChart" aria-label="Yearly sunrise and sunset chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div id="daily-sun-bar-section" class="daily-sun-bar-section card hidden" aria-label="Today's Sun Phases">
+                        <h3 class="daily-sun-bar-heading" id="dailySunBarHeading">Today's Sun Phases</h3>
+                        <div class="daily-sun-bar-container">
+                            <div class="daily-sun-bar-date" id="dailySunBarDateDisplay">—</div>
+                            <div class="sun-bar-segments-wrapper">
+                                <div class="daily-sun-bar" id="dailySunBar" aria-hidden="true"></div>
+                                <div class="solar-noon-marker hidden" id="solarNoonMarker" aria-hidden="true"></div>
+                            </div>
+                        </div>
+                        <div class="daily-sun-bar-legend" id="dailySunBarLegend" aria-label="Sun phase legend"></div>
+                    </div>
+
+                    <div id="daily-sun-progression-section" class="daily-sun-progression-section card hidden" aria-label="Sun path today">
+                        <h3 class="daily-sun-progression-heading">
+                            Sun's Path on <span id="dailyProgressionChartDate">—</span> in <span id="dailyProgressionChartCity">—</span>
+                        </h3>
+                        <div class="daily-sun-progression-container">
+                            <div class="daily-chart-wrapper">
+                                <canvas id="dailySunAltitudeChart" aria-label="Sun altitude chart"></canvas>
+                            </div>
+                            <div id="dailySunInfoPanel" class="daily-sun-info-panel">
+                                <div id="panelTime" class="panel-time">—</div>
+                                <div><strong>Altitude:</strong> <span id="panelAltitude">—</span></div>
+                                <div><strong>Heading:</strong> <span id="panelHeading">—</span></div>
+                                <div><strong>Position:</strong> <span id="panelPosition">—</span></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -289,6 +371,7 @@
         </main>
 
     </div>
-    <script src="/js/app.js?v=24" type="module"></script>
+    <script src="/js/site-header-nav.js?v=3" type="module"></script>
+    <script src="/js/app.js?v=25" type="module"></script>
 </body>
 </html>

@@ -13,10 +13,6 @@
 }
 
 .sun-times-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
     margin-bottom: 0.35rem;
 }
 
@@ -27,24 +23,6 @@
     color: var(--text-primary);
     line-height: 1.35;
     text-align: left;
-    flex: 1;
-}
-
-.sun-times-chevron {
-    flex-shrink: 0;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: var(--bg-input);
-    color: var(--text-secondary);
-    font-size: 0.85rem;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: default;
-    user-select: none;
 }
 
 .sun-times-list {

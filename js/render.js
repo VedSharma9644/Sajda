@@ -14,8 +14,9 @@ import { updateNextPrayerUI, startNextPrayerTick, stopNextPrayerTick } from './n
 import { buildPrayerUrl, readPrayerFromUrl } from './location-routing.js';
 import { renderPrayerDetailPage, hidePrayerDetailPage, isPrayerDetailRoute } from './prayer-detail.js';
 import { startClockWidget, startLocalClockWidget } from './clock-widget.js';
-import { refreshWeatherWidget, hideWeatherWidget } from './weather-widget.js?v=24';
-import { renderSunTimesWidget, hideSunTimesWidget } from './sun-times-widget.js?v=24';
+import { refreshWeatherWidget, hideWeatherWidget } from './weather-widget.js?v=30';
+import { renderSunTimesWidget, hideSunTimesWidget } from './sun-times-widget.js?v=25';
+import { refreshYearlySunChart, hideYearlySunChart } from '../sun-chart/sun-chart-entry.js?v=6';
 
 /** Status line under location controls (`success` / `error` add CSS classes). */
 export function setStatus(text, type) {
@@ -65,6 +66,7 @@ export function showError(msg) {
     startLocalClockWidget();
     hideWeatherWidget();
     hideSunTimesWidget();
+    hideYearlySunChart();
 }
 
 /** Hides the global error message element. */
@@ -127,6 +129,7 @@ export function renderToday(data) {
     startNextPrayerTick();
 
     renderSunTimesWidget(timings);
+    void refreshYearlySunChart();
 
     show(resultsSection);
     show(todayTimings);
@@ -194,6 +197,7 @@ export function renderMonth(data) {
 
     stopNextPrayerTick();
     hideSunTimesWidget();
+    hideYearlySunChart();
 
     show(resultsSection);
     hide(todayTimings);

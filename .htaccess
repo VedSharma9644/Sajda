@@ -12,11 +12,65 @@
   RewriteEngine On
   RewriteBase /
 
-  # Prayer detail pages: /{city}/prayer-times/{prayer}
+  # Optional: redirect site root to world-clock landing (prayer home stays at /index.html).
+  # RewriteRule ^/?$ /times [R=302,L]
+
+  # Legacy …/prayer → …/prayer-times
+  RewriteRule ^([^/]+)/([^/]+)/prayer/?$ /$1/$2/prayer-times [R=301,L,NC]
+  RewriteRule ^([^/]+)/prayer/?$ /$1/prayer-times [R=301,L,NC]
+
+  # Prayer detail (longer paths first)
+  RewriteRule ^[^/]+/[^/]+/prayer-times/(fajr|dhuhr|asr|maghrib|isha)/?$ /prayer-times/$1.html [L,NC]
+  RewriteRule ^[^/]+/[^/]+/prayer-times/?$ /pages/prayer-hub.html [L,NC]
   RewriteRule ^[^/]+/prayer-times/(fajr|dhuhr|asr|maghrib|isha)/?$ /prayer-times/$1.html [L,NC]
+  RewriteRule ^[^/]+/prayer-times/?$ /pages/prayer-hub.html [L,NC]
   RewriteRule ^prayer-times/(fajr|dhuhr|asr|maghrib|isha)/?$ /prayer-times/$1.html [L,NC]
+
+  # /{country}/{city}/time|sun|weather
+  RewriteRule ^[^/]+/[^/]+/time/?$ /pages/time.html [L,NC]
+  RewriteRule ^[^/]+/[^/]+/sun/?$ /pages/sun.html [L,NC]
+  RewriteRule ^[^/]+/[^/]+/weather/?$ /pages/weather.html [L,NC]
+
+  # /{place}/time|sun|weather
+  RewriteRule ^[^/]+/time/?$ /pages/time.html [L,NC]
+  RewriteRule ^[^/]+/sun/?$ /pages/sun.html [L,NC]
+  RewriteRule ^[^/]+/weather/?$ /pages/weather.html [L,NC]
+
+  # Location root should render the time page:
+  # - /{country}/{city} → /pages/time.html
+  # - /{city} → /pages/time.html
+  # Keep assets and known endpoints intact.
+  RewriteCond %{REQUEST_URI} !^/(css|js|pages|sun-chart|prayer-times)(/|$) [NC]
+  RewriteCond %{REQUEST_URI} !^/(api\.php|weather\.php|geocode\.php|time-meta\.php|region-cities\.php|cache-clean\.php|sun-year\.php|sun-day\.php|style\.css)$ [NC]
+  RewriteRule ^[^/]+/[^/]+/?$ /pages/time.html [L,NC]
+
+  RewriteCond %{REQUEST_URI} !^/(css|js|pages|sun-chart|prayer-times)(/|$) [NC]
+  RewriteCond %{REQUEST_URI} !^/(api\.php|weather\.php|geocode\.php|time-meta\.php|region-cities\.php|cache-clean\.php|sun-year\.php|sun-day\.php|style\.css)$ [NC]
+  RewriteRule ^[^/]+/?$ /pages/time.html [L,NC]
+
+  RewriteRule ^[^/]+/[^/]+/style\.css$ /style.css [L,NC]
+  RewriteRule ^[^/]+/[^/]+/js/(.+)$ /js/$1 [L,NC]
+  RewriteRule ^[^/]+/[^/]+/sun-chart/(.+)$ /sun-chart/$1 [L,NC]
+  RewriteRule ^[^/]+/[^/]+/sun-year\.php$ /sun-year.php [L,NC]
+  RewriteRule ^[^/]+/[^/]+/sun-day\.php$ /sun-day.php [L,NC]
+  RewriteRule ^[^/]+/[^/]+/geocode\.php$ /geocode.php [L,NC]
+  RewriteRule ^[^/]+/[^/]+/time-meta\.php$ /time-meta.php [L,NC]
+  RewriteRule ^[^/]+/[^/]+/region-cities\.php$ /region-cities.php [L,NC]
+  RewriteRule ^[^/]+/[^/]+/weather\.php$ /weather.php [L,NC]
+  RewriteRule ^[^/]+/[^/]+/api\.php$ /api.php [L,NC]
+  RewriteRule ^[^/]+/[^/]+/cache-clean\.php$ /cache-clean.php [L,NC]
+
   RewriteRule ^[^/]+/style\.css$ /style.css [L,NC]
   RewriteRule ^[^/]+/js/(.+)$ /js/$1 [L,NC]
+  RewriteRule ^[^/]+/sun-chart/(.+)$ /sun-chart/$1 [L,NC]
+  RewriteRule ^[^/]+/sun-year\.php$ /sun-year.php [L,NC]
+  RewriteRule ^[^/]+/sun-day\.php$ /sun-day.php [L,NC]
+  RewriteRule ^[^/]+/geocode\.php$ /geocode.php [L,NC]
+  RewriteRule ^[^/]+/time-meta\.php$ /time-meta.php [L,NC]
+  RewriteRule ^[^/]+/region-cities\.php$ /region-cities.php [L,NC]
+  RewriteRule ^[^/]+/weather\.php$ /weather.php [L,NC]
+  RewriteRule ^[^/]+/api\.php$ /api.php [L,NC]
+  RewriteRule ^[^/]+/cache-clean\.php$ /cache-clean.php [L,NC]
 
   # Let the server serve existing files and directories (CSS, JS, api.php, …)
   RewriteCond %{REQUEST_FILENAME} -f [OR]
@@ -25,4 +79,50 @@
 
   # Everything else → single-page app shell (URL in the browser stays e.g. /jaipur)
   RewriteRule ^ /index.html [L]
+</IfModule>
+
+# -----------------------------------------------------------------------------
+# Performance: caching + compression for static assets
+# -----------------------------------------------------------------------------
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # HTML should revalidate frequently (SPA shell may change)
+  ExpiresByType text/html "access plus 0 seconds"
+
+  # Long cache for static assets (we already use ?v=... cache-busting)
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/javascript "access plus 1 year"
+  ExpiresByType application/json "access plus 1 day"
+
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/gif "access plus 1 year"
+
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType application/font-woff2 "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Cache immutable assets for a year (safe with versioned URLs)
+  <FilesMatch "\.(css|js|png|jpe?g|webp|gif|svg|woff2?|ttf|otf)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # HTML: always revalidate so users get latest deploy
+  <FilesMatch "\.(html)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css
+  AddOutputFilterByType DEFLATE application/javascript text/javascript
+  AddOutputFilterByType DEFLATE application/json application/xml text/xml
+  AddOutputFilterByType DEFLATE image/svg+xml
 </IfModule>

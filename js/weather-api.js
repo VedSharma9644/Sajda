@@ -44,6 +44,28 @@ function roundCoord(v) {
     return Number(v).toFixed(3);
 }
 
+async function fetchGeocodeFromServer(address) {
+    try {
+        const url = '/geocode.php?address=' + encodeURIComponent(address);
+        esajdaLog('weather', 'GET /geocode.php (server + SQLite)', { url });
+        const res = await fetch(url, { method: 'GET' });
+        const cacheHdr = res.headers.get('X-Esajda-Cache');
+        esajdaLog('weather', '/geocode.php response', {
+            status: res.status,
+            serverCache: cacheHdr || 'unknown'
+        });
+        if (!res.ok) return null;
+        const json = await res.json();
+        if (!json || !json.success || !json.data) return null;
+        const latitude = Number(json.data.latitude);
+        const longitude = Number(json.data.longitude);
+        if (Number.isNaN(latitude) || Number.isNaN(longitude)) return null;
+        return { latitude, longitude };
+    } catch (_) {
+        return null;
+    }
+}
+
 async function geocodeAddress(address) {
     const key = normalizeAddress(address);
     if (!key) return null;
@@ -53,6 +75,14 @@ async function geocodeAddress(address) {
     if (hit && hit.expiresAt > now()) {
         esajdaLog('weather', 'geocode cache HIT', { address: key });
         return { latitude: hit.latitude, longitude: hit.longitude };
+    }
+
+    // Prefer same-origin server proxy (cached in SQLite); fall back to direct Nominatim.
+    const serverCoords = await fetchGeocodeFromServer(address);
+    if (serverCoords) {
+        geoCache[key] = { latitude: serverCoords.latitude, longitude: serverCoords.longitude, expiresAt: now() + GEO_TTL_MS };
+        writeStore(GEO_CACHE_KEY, geoCache);
+        return serverCoords;
     }
 
     const url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(address) + '&format=json&addressdetails=1&limit=1';
@@ -77,7 +107,8 @@ async function geocodeAddress(address) {
     return { latitude, longitude };
 }
 
-async function resolveSelectedCoords() {
+/** Used by weather widget and yearly sun chart. */
+export async function resolveSelectedCoords() {
     if (state.useCoordinates && state.currentCoords) {
         return {
             latitude: Number(state.currentCoords.latitude),

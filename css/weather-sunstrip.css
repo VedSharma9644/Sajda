@@ -26,12 +26,6 @@
     grid-template-columns: 1fr;
 }
 
-/* In a narrow column, stack temp row above meta grid */
-.weather-sunstrip .weather-main {
-    grid-template-columns: 1fr;
-    gap: 0.65rem;
-}
-
 @media (max-width: 720px) {
     .weather-sunstrip {
         grid-template-columns: 1fr;

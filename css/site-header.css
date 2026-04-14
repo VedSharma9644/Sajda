@@ -1,0 +1,193 @@
+/* ----- Site header (all pages) ----- */
+.site-header {
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+}
+
+.site-header-breadcrumbs {
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+}
+
+.site-header-breadcrumbs-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.site-header-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.site-city-search {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.25rem 0.35rem;
+    box-shadow: var(--shadow-sm, var(--shadow));
+}
+
+.site-city-search input {
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font-family: var(--font);
+    font-size: 0.88rem;
+    padding: 0.35rem 0.5rem;
+    min-width: 16rem;
+    color: var(--text-primary);
+}
+
+.site-city-search button {
+    border: 0;
+    background: var(--accent);
+    color: var(--btn-on-accent);
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.45rem 0.7rem;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.site-city-search button:hover {
+    background: var(--accent-hover);
+}
+
+.site-city-search:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.site-breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.site-breadcrumbs a {
+    color: var(--link);
+    text-decoration: none;
+}
+
+.site-breadcrumbs a:hover {
+    text-decoration: underline;
+}
+
+.site-breadcrumb-sep {
+    opacity: 0.6;
+}
+
+.site-header-tabs {
+    background: var(--bg);
+}
+
+.site-tabs {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    width: 100%;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+}
+
+.site-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.7rem 0.55rem;
+    text-decoration: none;
+    color: var(--text-primary);
+    background: var(--bg);
+    border-right: 1px solid var(--border);
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.1;
+    white-space: nowrap;
+    user-select: none;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+.site-tab:hover {
+    background: var(--bg-input);
+}
+
+.site-tab:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+.site-tab-icon {
+    font-size: 1.05rem;
+    line-height: 1;
+}
+
+.site-tab[aria-current='page'] {
+    background: #2f80ed;
+    color: #fff;
+}
+
+.site-tab[aria-current='page'] .site-tab-icon {
+    filter: brightness(1.15);
+}
+
+.site-tab[aria-disabled='true'] {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.site-tab[aria-disabled='true']:hover {
+    background: var(--bg);
+}
+
+.site-header .theme-toggle {
+    position: static;
+    transform: none;
+    flex-shrink: 0;
+}
+
+@media (max-width: 720px) {
+    .site-tab {
+        font-size: 0.88rem;
+        padding: 0.65rem 0.45rem;
+    }
+
+    .site-city-search input {
+        min-width: 12rem;
+    }
+}
+
+@media (max-width: 560px) {
+    .site-tabs {
+        grid-auto-flow: row;
+        grid-auto-columns: unset;
+        border-left: 0;
+        border-right: 0;
+    }
+
+    .site-tab {
+        justify-content: flex-start;
+        border-right: 0;
+        border-top: 1px solid var(--border);
+        padding-left: 0.9rem;
+    }
+
+    .site-tab:first-child {
+        border-top: 0;
+    }
+}

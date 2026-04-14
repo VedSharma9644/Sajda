@@ -9,16 +9,26 @@
 import { MONTHS } from './config.js';
 import { state } from './state.js';
 import { $, show, hide } from './dom.js';
-import { fetchPrayerTimes } from './api.js?v=24';
+import { fetchPrayerTimes } from './api.js?v=26';
 import { updateMethodRecommendation } from './recommendations.js';
 import { runCompareWithKarachi } from './comparison.js';
-import { useLocation, useCity, bindLocationUI, applyCityFromUrlOnStartup } from './location.js?v=19';
+import { useLocation, useCity, bindLocationUI, applyCityFromUrlOnStartup } from './location.js?v=22';
 import { clearLocationCache } from './location-cache.js';
 import { startLocalClockWidget } from './clock-widget.js';
 import { esajdaLog } from './debug-log.js?v=21';
-import { initThemeToggle } from './theme.js';
+import { initThemeToggle } from './theme.js?v=2';
+import { pathPrefixFromAddress } from './location-routing.js';
 
 const FIRST_VISIT_LOCATION_PROMPT_KEY = 'esajda.location.prompted.v1';
+
+function navigateToTimePage(address) {
+    const prefix = pathPrefixFromAddress(address);
+    if (prefix) {
+        window.location.assign('/' + prefix + '/time');
+        return;
+    }
+    window.location.assign('/time');
+}
 
 /** Fills the month/year dropdowns for “This month” view with sensible defaults. */
 function buildMonthOptions() {
@@ -57,7 +67,7 @@ function init() {
         if (state.currentCoords || state.currentAddress) fetchPrayerTimes();
     });
 
-    bindLocationUI();
+    bindLocationUI({ navigateAfterPick: navigateToTimePage });
 
     const btnCompare = $('btn-compare-karachi');
     if (btnCompare) btnCompare.addEventListener('click', runCompareWithKarachi);

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('esajda.theme') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) { /* ignore */ }
+        })();
+    </script>
+    <title>Prayer times | e-Sajda</title>
+    <meta name="description" content="Today’s prayer times and monthly schedule for your city.">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/style.css?v=30">
+</head>
+<body>
+    <div class="app">
+        <header class="site-header" role="banner">
+            <div class="site-header-breadcrumbs">
+                <div class="site-header-breadcrumbs-inner">
+                    <nav id="site-breadcrumbs" class="site-breadcrumbs" aria-label="Breadcrumb"></nav>
+                    <div class="site-header-right">
+                        <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
+                            <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+                            <span class="theme-toggle-label">Dark mode</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <nav id="site-tabs" class="site-tabs" aria-label="Sections"></nav>
+        </header>
+        <main class="main prayer-page-main">
+            <section class="controls card site-location-strip" aria-label="Choose location">
+                <div class="location-section">
+                    <h2>Location</h2>
+                    <div class="location-actions">
+                        <button type="button" id="btn-use-location" class="btn btn-primary">
+                            <span class="btn-icon">📍</span> Use my location
+                        </button>
+                        <span class="or">or</span>
+                        <div class="city-input-wrap">
+                            <div class="city-input-autocomplete">
+                                <input type="text" id="input-city" placeholder="City, Country (e.g. London, UK)" autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions-dropdown" role="combobox" aria-label="City search">
+                                <div id="suggestions-dropdown" class="suggestions-dropdown hidden" role="listbox" aria-label="Location suggestions"></div>
+                            </div>
+                            <button type="button" id="btn-search-city" class="btn btn-secondary">Search</button>
+                        </div>
+                    </div>
+                    <p id="location-status" class="status" aria-live="polite"></p>
+                </div>
+            </section>
+            <section class="controls card prayer-hub-method-card" aria-label="Calculation method">
+                <div class="form-group method-form-group">
+                    <label for="select-method">Calculation method</label>
+                    <select id="select-method">
+                        <optgroup label="South Asia">
+                            <option value="1">University of Islamic Sciences, Karachi (India / Google)</option>
+                            <option value="20">Kementerian Agama Indonesia</option>
+                        </optgroup>
+                        <optgroup label="Middle East &amp; Gulf">
+                            <option value="4" selected>Umm Al-Qura University, Makkah</option>
+                            <option value="5">Egyptian General Authority</option>
+                            <option value="8">Gulf Region</option>
+                            <option value="9">Kuwait</option>
+                            <option value="10">Qatar</option>
+                            <option value="16">Dubai</option>
+                            <option value="23">Jordan</option>
+                            <option value="13">Turkey</option>
+                        </optgroup>
+                        <optgroup label="North America">
+                            <option value="2">ISNA (Islamic Society of North America)</option>
+                        </optgroup>
+                        <optgroup label="Other regions">
+                            <option value="3">MWL (Muslim World League)</option>
+                            <option value="11">Singapore</option>
+                            <option value="12">France</option>
+                            <option value="15">Moonsighting Committee</option>
+                            <option value="17">JAKIM (Malaysia)</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </section>
+            <section id="prayer-hub-hero" class="card prayer-hub-hero hidden" aria-label="Prayer times overview">
+                <div class="prayer-hub-hero-top">
+                    <div class="prayer-hub-hero-titlecol">
+                        <h1 id="prayer-hub-title" class="prayer-hub-title">Prayer times</h1>
+                        <p id="prayer-hub-subtitle" class="prayer-hub-subtitle"></p>
+                    </div>
+                    <div class="prayer-hub-hero-actions">
+                        <button type="button" id="prayer-hub-copy-link" class="btn btn-secondary">Copy page link</button>
+                    </div>
+                </div>
+                <div class="prayer-hub-hero-meta" aria-label="Current time and dates">
+                    <div class="prayer-hub-meta-item">
+                        <div class="k">Local time now</div>
+                        <div class="v" id="prayer-hub-now">—</div>
+                    </div>
+                    <div class="prayer-hub-meta-item">
+                        <div class="k">Gregorian date</div>
+                        <div class="v" id="prayer-hub-greg">—</div>
+                    </div>
+                    <div class="prayer-hub-meta-item">
+                        <div class="k">Hijri date</div>
+                        <div class="v" id="prayer-hub-hijri">—</div>
+                    </div>
+                    <div class="prayer-hub-meta-item">
+                        <div class="k">Timezone</div>
+                        <div class="v" id="prayer-hub-tz">—</div>
+                    </div>
+                </div>
+                <p id="prayer-hub-blurb" class="prayer-hub-blurb"></p>
+                <div class="prayer-hero-extras">
+                    <p id="prayer-hub-longdesc" class="prayer-hub-longdesc"></p>
+                    <div class="notice notice-bookmark" role="note" aria-label="Bookmark notice">
+                        <strong>📌 Bookmark this page:</strong>
+                        Daily prayer times change based on the sun’s position. Press <strong>Ctrl + D</strong> (Windows) or
+                        <strong>Cmd + D</strong> (Mac) to save this page and check timings daily.
+                    </div>
+                </div>
+            </section>
+            <section id="results-section" class="results-section">
+                <div class="results-header card">
+                    <h2 id="results-title">Prayer times</h2>
+                    <div id="results-context" class="results-context" aria-label="Location and calculation method">
+                        <p id="results-location" class="results-location"></p>
+                        <p id="results-method" class="results-method"></p>
+                    </div>
+                    <p id="results-meta" class="results-meta"></p>
+                    <p id="results-method-tip" class="method-tip hidden" role="note"></p>
+                </div>
+
+                <div id="today-timings" class="timings-today card hidden">
+                    <div id="next-prayer-box" class="next-prayer-box hidden" aria-live="polite">
+                        <span class="next-prayer-label">Next prayer</span>
+                        <span id="next-prayer-name" class="next-prayer-name"></span>
+                        <span id="next-prayer-countdown" class="next-prayer-countdown"></span>
+                    </div>
+                    <ul class="prayer-list" id="prayer-list" aria-label="Daily prayer times"></ul>
+                </div>
+
+                <div id="seven-day-timings" class="timings-month card hidden" aria-label="Prayer schedule">
+                    <div id="hub-prayer-toolbar" class="hub-prayer-toolbar">
+                        <div class="hub-prayer-toolbar-left">
+                            <div class="form-group">
+                                <label>Calendar type</label>
+                                <div class="segmented segmented-sm" role="group" aria-label="Calendar type">
+                                    <button type="button" id="cal-type-greg" class="segmented-btn" aria-pressed="true">Gregorian</button>
+                                    <button type="button" id="cal-type-hijri" class="segmented-btn" aria-pressed="false">Hijri</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hub-prayer-toolbar-right">
+                            <div class="options-row prayer-hub-view-row">
+                                <div class="form-group">
+                                    <label for="view-mode">View</label>
+                                    <select id="view-mode">
+                                        <option value="today" selected>Today</option>
+                                        <option value="next30">Next 30 days</option>
+                                        <option value="month">This month</option>
+                                    </select>
+                                </div>
+                                <div id="month-picker" class="month-picker hidden">
+                                    <div class="form-group">
+                                        <label for="select-month">Month</label>
+                                        <select id="select-month"></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="select-year">Year</label>
+                                        <select id="select-year"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="schedule-head hub-schedule-head">
+                        <h3 class="seven-day-heading" id="hub-schedule-heading">Next 7 days</h3>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="prayer-table" id="prayer-table-seven">
+                            <thead>
+                                <tr>
+                                    <th class="col-greg">Date</th>
+                                    <th class="col-hijri">Hijri</th>
+                                    <th>Fajr</th>
+                                    <th>Dhuhr</th>
+                                    <th>Asr</th>
+                                    <th>Maghrib</th>
+                                    <th>Isha</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prayer-table-seven-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="month-timings" class="timings-month card hidden">
+                    <div class="table-wrap">
+                        <table class="prayer-table" id="prayer-table" aria-label="Monthly prayer times">
+                            <thead>
+                                <tr>
+                                    <th class="col-greg">Date</th>
+                                    <th class="col-hijri">Hijri</th>
+                                    <th>Fajr</th>
+                                    <th>Dhuhr</th>
+                                    <th>Asr</th>
+                                    <th>Maghrib</th>
+                                    <th>Isha</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prayer-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <p id="error-message" class="error-message card hidden" role="alert"></p>
+            </section>
+        </main>
+    </div>
+    <script src="/js/site-header-nav.js?v=3" type="module"></script>
+    <script src="/js/site-location-panel.js?v=1" type="module"></script>
+    <script src="/js/prayer-hub-page.js?v=7" type="module"></script>
+</body>
+</html>

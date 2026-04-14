@@ -14,25 +14,49 @@
     </script>
     <title>Fajr Prayer Times | e-Sajda</title>
     <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="/style.css?v=27">
+    <link rel="stylesheet" href="/style.css?v=30">
 </head>
 <body data-prayer="fajr">
     <div class="app">
-        <header class="header">
-            <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
-                <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
-                <span class="theme-toggle-label">Dark mode</span>
-            </button>
-            <div class="header-brand">
-                <h1 class="logo">e-Sajda</h1>
-                <p class="tagline">Prayer Detail Page</p>
+        <header class="site-header" role="banner">
+            <div class="site-header-breadcrumbs">
+                <div class="site-header-breadcrumbs-inner">
+                    <nav id="site-breadcrumbs" class="site-breadcrumbs" aria-label="Breadcrumb"></nav>
+                    <div class="site-header-right">
+                        <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
+                            <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+                            <span class="theme-toggle-label">Dark mode</span>
+                        </button>
+                    </div>
+                </div>
             </div>
+            <nav id="site-tabs" class="site-tabs" aria-label="Sections"></nav>
         </header>
         <main class="main prayer-page-main">
+            <section class="controls card site-location-strip" aria-label="Choose location">
+                <div class="location-section">
+                    <h2>Location</h2>
+                    <div class="location-actions">
+                        <button type="button" id="btn-use-location" class="btn btn-primary">
+                            <span class="btn-icon">📍</span> Use my location
+                        </button>
+                        <span class="or">or</span>
+                        <div class="city-input-wrap">
+                            <div class="city-input-autocomplete">
+                                <input type="text" id="input-city" placeholder="City, Country (e.g. London, UK)" autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions-dropdown" role="combobox" aria-label="City search">
+                                <div id="suggestions-dropdown" class="suggestions-dropdown hidden" role="listbox" aria-label="Location suggestions"></div>
+                            </div>
+                            <button type="button" id="btn-search-city" class="btn btn-secondary">Search</button>
+                        </div>
+                    </div>
+                    <p id="location-status" class="status" aria-live="polite"></p>
+                </div>
+            </section>
             <p class="breadcrumbs">Home / <span id="crumb-city">City</span> / Prayer Times / <span id="crumb-prayer">Fajr Prayer Times</span></p>
             <div class="prayer-top-actions card">
-                <span>⚙ Calculation Settings</span>
-                <span>🔗 Share Page</span>
+                <button type="button" id="share-page-btn" class="prayer-top-action" aria-label="Share this page">
+                    <span aria-hidden="true">🔗</span> Share Page
+                </button>
             </div>
 
             <section class="card prayer-page-card">
@@ -41,20 +65,19 @@
                         <h2 id="hero-title">Fajr Prayer Time Today</h2>
                         <p class="prayer-page-city" id="page-city">—</p>
                     </div>
-                    <div class="method-select-wrap">
-                        <label for="method-select">Calculation method</label>
-                        <select id="method-select">
-                            <option value="4" selected>Umm Al-Qura University, Makkah</option>
-                            <option value="1">University of Islamic Sciences, Karachi</option>
-                            <option value="3">MWL (Muslim World League)</option>
-                            <option value="2">ISNA</option>
-                        </select>
-                    </div>
                 </div>
                 <p id="hero-time" class="hero-time">--:--</p>
                 <div class="hero-badges">
                     <p id="tomorrow-shift" class="hero-badge hidden"></p>
                     <p id="time-status" class="hero-badge hidden"></p>
+                </div>
+                <div class="prayer-hero-extras">
+                    <p id="prayer-longdesc" class="prayer-longdesc"></p>
+                    <div class="notice notice-bookmark" role="note" aria-label="Bookmark notice">
+                        <strong>📌 Bookmark this page:</strong>
+                        Daily prayer times change based on the sun’s position. Press <strong>Ctrl + D</strong> (Windows) or
+                        <strong>Cmd + D</strong> (Mac) to save this page and check timings daily.
+                    </div>
                 </div>
                 <div id="prayer-tabs" class="prayer-tabs"></div>
                 <div id="daily-times" class="daily-times"></div>
@@ -71,19 +94,52 @@
             </section>
 
             <section class="card prayer-page-card">
-                <h3>7-Day Fajr schedule</h3>
+                <div class="schedule-head">
+                    <h3 id="schedule-heading">7-Day Fajr schedule</h3>
+                    <div class="schedule-controls">
+                        <div class="segmented segmented-sm" role="group" aria-label="Calendar type">
+                            <button type="button" id="cal-type-greg" class="segmented-btn" aria-pressed="true">Gregorian</button>
+                            <button type="button" id="cal-type-hijri" class="segmented-btn" aria-pressed="false">Hijri</button>
+                        </div>
+                    <label class="schedule-label" for="schedule-days">
+                        View
+                        <select id="schedule-days">
+                            <option value="7" selected>7 days</option>
+                            <option value="30">Next 30 days</option>
+                        </select>
+                    </label>
+                    </div>
+                </div>
                 <div class="table-wrap">
                     <table class="prayer-table">
                         <thead>
-                            <tr><th>Date</th><th>Hijri</th><th>Time</th></tr>
+                            <tr><th class="col-greg">Date</th><th class="col-hijri">Hijri</th><th>Time</th></tr>
                         </thead>
                         <tbody id="seven-day-body"></tbody>
                     </table>
                 </div>
             </section>
+
+            <section id="major-cities" class="card hidden" aria-label="Major cities">
+                <div class="card-head">
+                    <h3 class="card-title" id="major-cities-title">Major cities</h3>
+                    <p class="card-subtitle" id="major-cities-sub"></p>
+                </div>
+                <div id="major-cities-list" class="time-other-cities-list" aria-label="Major cities list"></div>
+            </section>
+
+            <section id="country-cities" class="card hidden" aria-label="Major cities in country">
+                <div class="card-head">
+                    <h3 class="card-title" id="country-cities-title">Major cities in country</h3>
+                    <p class="card-subtitle" id="country-cities-sub"></p>
+                </div>
+                <div id="country-cities-list" class="time-other-cities-list" aria-label="Major cities in country list"></div>
+            </section>
             <p id="page-error" class="status error"></p>
         </main>
     </div>
-    <script src="/js/prayer-page.js?v=10" type="module"></script>
+    <script src="/js/site-header-nav.js?v=3" type="module"></script>
+    <script src="/js/site-location-panel.js?v=1" type="module"></script>
+    <script src="/js/prayer-page.js?v=12" type="module"></script>
 </body>
 </html>

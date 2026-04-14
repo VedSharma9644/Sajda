@@ -1,0 +1,448 @@
+/* Yearly sun chart (see /sun-chart/*.js) */
+.yearly-sun-chart-section.hidden {
+    display: none;
+}
+
+.yearly-sun-chart-section {
+    margin-top: 1rem;
+}
+
+.yearly-sun-chart-title {
+    margin: 0 0 0.25rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.yearly-sun-chart-caption {
+    margin: 0 0 0.75rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.sun-graph-container {
+    position: relative;
+    width: 100%;
+    min-height: 280px;
+    height: min(42vw, 380px);
+    max-height: 420px;
+    animation: sun-graph-reveal 0.7s ease-out both;
+}
+
+@keyframes sun-graph-reveal {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sun-graph-container {
+        animation: none;
+    }
+}
+
+/* --- Daily sun phases bar (today) --- */
+.daily-sun-bar-section.hidden {
+    display: none;
+}
+
+.daily-sun-bar-heading {
+    margin: 0 0 0.75rem;
+    font-size: 1.05rem;
+    font-weight: 650;
+}
+
+.daily-sun-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.daily-sun-bar-date {
+    min-width: 54px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.sun-bar-segments-wrapper {
+    position: relative;
+    flex-grow: 1;
+    height: 22px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--bg-card) 88%, #000);
+    outline: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+}
+
+.daily-sun-bar {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.sun-phase {
+    display: block;
+    height: 100%;
+}
+
+.sun-phase.night {
+    background: #2b2f6b;
+}
+
+.sun-phase.astro-twilight {
+    background: #3e4aa0;
+}
+
+.sun-phase.nautical-twilight {
+    background: #5c79d6;
+}
+
+.sun-phase.civil-twilight {
+    background: #b7d7f3;
+}
+
+.sun-phase.daylight {
+    background: #fff6c7;
+}
+
+/* Solar noon marker */
+.solar-noon-marker {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #ff3b30;
+    z-index: 10;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--bg-card) 70%, transparent);
+}
+
+.solar-noon-marker.hidden {
+    display: none !important;
+}
+
+.daily-sun-bar-legend {
+    margin-top: 0.9rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.9rem 1.1rem;
+}
+
+.legend-item {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.legend-item-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.3rem;
+    color: var(--text-primary);
+}
+
+.legend-color-box {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    outline: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+}
+
+.legend-item-phase-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.legend-item-times {
+    display: grid;
+    gap: 0.15rem;
+}
+
+.legend-item-total {
+    margin-top: 0.25rem;
+    color: var(--text-secondary);
+}
+
+.legend-item-solarnoon .legend-item-header {
+    gap: 0.4rem;
+}
+
+.solar-noon-swatch {
+    color: #ff3b30;
+    font-weight: 800;
+}
+
+@media (max-width: 520px) {
+    .daily-sun-bar-container {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+    .daily-sun-bar-date {
+        min-width: auto;
+    }
+    .sun-bar-segments-wrapper {
+        width: 100%;
+    }
+}
+
+/* --- Daily sun progression chart (altitude vs time) --- */
+.daily-sun-progression-section.hidden {
+    display: none;
+}
+
+.daily-sun-progression-heading {
+    margin: 0 0 0.75rem;
+    font-size: 1.05rem;
+    font-weight: 650;
+}
+
+.daily-sun-progression-container {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 1rem;
+    align-items: start;
+}
+
+.daily-chart-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 320px;
+    height: min(42vw, 380px);
+    max-height: 420px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--bg-card);
+    outline: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+}
+
+.daily-chart-wrapper canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.daily-sun-info-panel {
+    background: var(--bg-card);
+    border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+    border-radius: 12px;
+    padding: 0.85rem 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+/* Dark theme: add subtle depth behind chart/panel */
+html[data-theme='dark'] .daily-chart-wrapper {
+    background: color-mix(in srgb, var(--bg-card) 86%, #000);
+    outline: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+}
+
+html[data-theme='dark'] .daily-sun-info-panel {
+    background: color-mix(in srgb, var(--bg-card) 80%, #000);
+    border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+}
+
+.daily-sun-info-panel strong {
+    color: var(--text-primary);
+    font-weight: 650;
+}
+
+.panel-time {
+    font-size: 1.6rem;
+    font-weight: 750;
+    letter-spacing: 0.02em;
+    color: var(--text-primary);
+    margin-bottom: 0.4rem;
+}
+
+@media (max-width: 780px) {
+    .daily-sun-progression-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.sun-graph-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    box-sizing: border-box;
+}
+
+.sun-graph-loader {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: color-mix(in srgb, var(--bg-card) 88%, transparent);
+    z-index: 2;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.sun-graph-loader.hidden {
+    display: none !important;
+}
+
+.sun-graph-loader .spinner {
+    width: 36px;
+    height: 36px;
+    margin: 0;
+}
+
+@media (max-width: 600px) {
+    .sun-graph-container {
+        height: min(58vw, 320px);
+        min-height: 240px;
+    }
+}
+
+/* --- Monthly sun table (location sun page) --- */
+.sun-month-calendar-section.hidden {
+    display: none;
+}
+
+.sun-month-calendar-section {
+    margin-top: 1rem;
+}
+
+.sun-month-calendar-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.sun-month-calendar-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 650;
+    flex: 1 1 12rem;
+}
+
+.sun-month-calendar-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem 1rem;
+}
+
+.sun-month-calendar-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.sun-month-calendar-label-text {
+    font-weight: 500;
+}
+
+.sun-month-calendar-label--disabled {
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+.sun-month-calendar-select {
+    min-width: 8.5rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.sun-month-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+    outline: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+}
+
+.sun-month-table {
+    width: 100%;
+    min-width: 920px;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+    text-align: center;
+}
+
+.sun-month-table th,
+.sun-month-table td {
+    border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+    padding: 0.35rem 0.4rem;
+    vertical-align: middle;
+    line-height: 1.35;
+}
+
+.sun-month-th-group,
+.sun-month-th-sub {
+    background: color-mix(in srgb, var(--bg-card) 70%, var(--border));
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.sun-month-th-day {
+    background: color-mix(in srgb, var(--bg-card) 70%, var(--border));
+    text-align: left;
+    font-weight: 600;
+}
+
+.sun-month-td-day {
+    text-align: left;
+    font-weight: 500;
+    background: color-mix(in srgb, var(--bg-card) 92%, transparent);
+}
+
+.sun-month-bearing {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.sun-month-diff-pos {
+    color: #15803d;
+    font-weight: 600;
+}
+
+html[data-theme='dark'] .sun-month-diff-pos {
+    color: #4ade80;
+}
+
+.sun-month-diff-neg {
+    color: var(--text-secondary);
+}
+
+.sun-month-tr-today .sun-month-td,
+.sun-month-tr-today .sun-month-td-day {
+    background: color-mix(in srgb, #fef08a 35%, var(--bg-card));
+    font-weight: 650;
+}
+
+html[data-theme='dark'] .sun-month-tr-today .sun-month-td,
+html[data-theme='dark'] .sun-month-tr-today .sun-month-td-day {
+    background: color-mix(in srgb, #ca8a04 22%, var(--bg-card));
+}
+
+@media (max-width: 640px) {
+    .sun-month-calendar-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sun-month-calendar-controls {
+        justify-content: flex-start;
+    }
+}

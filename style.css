@@ -1,10 +1,12 @@
 @import url("./css/tokens-base.css");
+@import url("./css/site-header.css");
 @import url("./css/controls.css");
 @import url("./css/results.css");
 @import url("./css/clock.css");
 @import url("./css/weather.css");
 @import url("./css/sun-times.css");
 @import url("./css/weather-sunstrip.css");
+@import url("./sun-chart/sun-chart.css");
 @import url("./css/prayer-pages.css");
 @import url("./css/feedback-footer.css");
 @import url("./css/responsive.css");

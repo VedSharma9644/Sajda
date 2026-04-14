@@ -9,12 +9,16 @@
 import { state } from './state.js';
 import { $, show, hide } from './dom.js';
 import { escapeHtml, getDisplayLocation, englishPlaceLabelFromNominatim } from './utils.js';
-import { setStatus, setResultsContext, showLoading } from './render.js?v=24';
+import { setStatus, setResultsContext, showLoading } from './render.js?v=25';
 import { updateMethodRecommendation } from './recommendations.js';
 import { fetchPrayerTimes } from './api.js';
 import { replaceBrowserUrlWithCity, clearCityFromBrowserUrl, readCityFromUrl } from './location-routing.js';
+import { refreshSiteHeaderToolsNav } from './site-header-nav.js?v=3';
 import { getCachedSuggestions, setCachedSuggestions, getCachedReverseLabel, setCachedReverseLabel } from './location-cache.js';
 import { esajdaLog } from './debug-log.js?v=21';
+
+/** When set by `bindLocationUI({ navigateAfterPick })`, city/GPS picks full-page navigate instead of SPA home flow. */
+let locationUiNavigateAfterPick = null;
 
 /**
  * Applies the place from the current URL path (and migrates old `?city=` once).
@@ -32,6 +36,7 @@ function applyCityFromCurrentUrl() {
     setStatus('Using: ' + city, 'success');
     updateMethodRecommendation();
     fetchPrayerTimes();
+    refreshSiteHeaderToolsNav();
 }
 
 /** Clears suggestion state and hides the dropdown (also used after picking a place). */
@@ -68,14 +73,14 @@ function showSuggestions(items) {
         suggestionsDropdown.innerHTML = '<div class="suggestion-empty">No places found. Try a different search.</div>';
     } else {
         suggestionsDropdown.innerHTML = state.suggestionsList.map((item, i) => {
-            const label = englishPlaceLabelFromNominatim(item);
+            const label = suggestionItemLabel(item);
             return '<button type="button" class="suggestion-item" role="option" data-index="' + i + '" aria-selected="false">' + escapeHtml(label) + '</button>';
         }).join('');
         suggestionsDropdown.querySelectorAll('.suggestion-item').forEach((btn, i) => {
             // Keep focus on the input so blur+timeout does not remove the list before click fires.
             btn.addEventListener('mousedown', (e) => e.preventDefault());
             btn.addEventListener('click', () => {
-                inputCity.value = englishPlaceLabelFromNominatim(state.suggestionsList[i]);
+                inputCity.value = suggestionItemLabel(state.suggestionsList[i]);
                 closeSuggestions();
                 useCity();
             });
@@ -98,25 +103,30 @@ function fetchSuggestions(query) {
         return;
     }
     showSuggestionsLoading();
-    const url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query) + '&format=json&addressdetails=1&namedetails=1&limit=6';
+    const url = '/popular-cities.php?q=' + encodeURIComponent(query) + '&limit=6';
     fetch(url, {
         method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-            'Accept-Language': 'en',
-            'User-Agent': 'e-Sajda/1.0 (Prayer Times)'
-        }
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
     })
-        .then((res) => res.json())
-        .then((data) => {
-            if (Array.isArray(data) && data.length) {
-                setCachedSuggestions(query, data);
-                showSuggestions(data);
+        .then((res) => res.ok ? res.json() : null)
+        .then((json) => {
+            const cities = json && json.success && json.data && Array.isArray(json.data.cities) ? json.data.cities : [];
+            if (cities.length) {
+                setCachedSuggestions(query, cities);
+                showSuggestions(cities);
             } else {
                 showSuggestions([]);
             }
         })
         .catch(() => showSuggestions([]));
+}
+
+function suggestionItemLabel(item) {
+    if (!item) return '';
+    if (typeof item === 'string') return item.trim();
+    if (typeof item.label === 'string' && item.label.trim()) return item.label.trim();
+    return englishPlaceLabelFromNominatim(item);
 }
 
 /** Debounced handler on the city input — waits 300ms after typing before searching. */
@@ -152,7 +162,7 @@ function selectHighlighted() {
     if (!inputCity || !state.suggestionsList.length) return;
     const idx = state.suggestionHighlight;
     if (idx >= 0 && idx < state.suggestionsList.length) {
-        inputCity.value = englishPlaceLabelFromNominatim(state.suggestionsList[idx]);
+        inputCity.value = suggestionItemLabel(state.suggestionsList[idx]);
     }
     closeSuggestions();
     useCity();
@@ -168,6 +178,40 @@ export function useLocation() {
         setStatus('Geolocation is not supported by your browser.', 'error');
         return;
     }
+    const onErr = (err) => {
+        state.currentCoords = null;
+        const msg = err.code === 1 ? 'Location permission denied.'
+            : err.code === 2 ? 'Location unavailable.'
+            : 'Could not get location.';
+        setStatus(msg, 'error');
+        showLoading(false);
+    };
+
+    if (locationUiNavigateAfterPick) {
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                setStatus('Finding address…');
+                const cached = getCachedReverseLabel(lat, lon);
+                const p = cached ? Promise.resolve(cached) : reverseGeocodeLatLonToAddress(lat, lon);
+                p.then((addr) => {
+                    if (addr) {
+                        setStatus('Using: ' + addr, 'success');
+                        locationUiNavigateAfterPick(addr);
+                    } else {
+                        setStatus('Could not resolve address from GPS. Try searching for a city.', 'error');
+                    }
+                }).catch(() => {
+                    setStatus('Could not resolve address from GPS.', 'error');
+                });
+            },
+            onErr,
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+        );
+        return;
+    }
+
     navigator.geolocation.getCurrentPosition(
         (pos) => {
             state.currentCoords = { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
@@ -177,16 +221,10 @@ export function useLocation() {
             setStatus('Location: ' + state.currentCoords.latitude.toFixed(4) + ', ' + state.currentCoords.longitude.toFixed(4), 'success');
             updateMethodRecommendation();
             fetchPrayerTimes();
+            refreshSiteHeaderToolsNav();
             reverseGeocodeAndUpdateLocation();
         },
-        (err) => {
-            state.currentCoords = null;
-            const msg = err.code === 1 ? 'Location permission denied.'
-                : err.code === 2 ? 'Location unavailable.'
-                : 'Could not get location.';
-            setStatus(msg, 'error');
-            showLoading(false);
-        },
+        onErr,
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
     );
 }
@@ -195,6 +233,47 @@ export function useLocation() {
  * Turns lat/lon into a readable place name (prefers district over a distant big city)
  * and refreshes the results header + method recommendation when done.
  */
+function compactLabelFromNominatimReverse(data) {
+    var address = data && data.address ? data.address : null;
+    var settlement =
+        address && (address.city || address.town || address.village || address.municipality || address.hamlet || address.locality || address.suburb || address.county)
+            ? (address.city || address.town || address.village || address.municipality || address.hamlet || address.locality || address.suburb || address.county)
+            : '';
+    var district =
+        address && (address.state_district || address.district)
+            ? (address.state_district || address.district)
+            : '';
+    var region =
+        address && (address.state || address.region)
+            ? (address.state || address.region)
+            : '';
+    var country = address && address.country ? address.country : '';
+    if (district) settlement = district;
+    else if (!settlement && district) settlement = district;
+    var compact = [settlement, region, country].filter(Boolean).join(', ');
+    return compact || englishPlaceLabelFromNominatim(data) || null;
+}
+
+function reverseGeocodeLatLonToAddress(lat, lon) {
+    var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + encodeURIComponent(lat) +
+        '&lon=' + encodeURIComponent(lon) + '&zoom=18&addressdetails=1&namedetails=1&accept-language=en';
+    esajdaLog('nominatim', 'GET reverse (label)', { lat, lon });
+    return fetch(url, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Accept-Language': 'en',
+            'User-Agent': 'e-Sajda/1.0 (Prayer Times)'
+        }
+    })
+        .then((res) => res.json())
+        .then((data) => {
+            var label = compactLabelFromNominatimReverse(data);
+            if (label) setCachedReverseLabel(lat, lon, label);
+            return label;
+        });
+}
+
 function reverseGeocodeAndUpdateLocation() {
     if (!state.currentCoords) return;
     var lat = state.currentCoords.latitude;
@@ -208,62 +287,23 @@ function reverseGeocodeAndUpdateLocation() {
             : '—';
         setResultsContext(getDisplayLocation(), cachedMethodName);
         updateMethodRecommendation();
+        refreshSiteHeaderToolsNav();
         return;
     }
 
-    var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + encodeURIComponent(lat) +
-        '&lon=' + encodeURIComponent(lon) + '&zoom=18&addressdetails=1&namedetails=1&accept-language=en';
-
-    esajdaLog('nominatim', 'GET reverse (label)', { lat, lon });
-    fetch(url, {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-            'Accept-Language': 'en',
-            'User-Agent': 'e-Sajda/1.0 (Prayer Times)'
-        }
-    })
-        .then((res) => res.json())
-        .then((data) => {
-            var address = data && data.address ? data.address : null;
-
-            // Prefer the closest settlement-like field. If Nominatim returns a capital/major city,
-            // but the district field is different, use the district to avoid misleading headers.
-            var settlement =
-                address && (address.city || address.town || address.village || address.municipality || address.hamlet || address.locality || address.suburb || address.county)
-                    ? (address.city || address.town || address.village || address.municipality || address.hamlet || address.locality || address.suburb || address.county)
-                    : '';
-
-            var district =
-                address && (address.state_district || address.district)
-                    ? (address.state_district || address.district)
-                    : '';
-
-            var region =
-                address && (address.state || address.region)
-                    ? (address.state || address.region)
-                    : '';
-
-            var country = address && address.country ? address.country : '';
-
-            // Prefer district when available (more reliable for “city” label than municipalities).
-            if (district) settlement = district;
-            else if (!settlement && district) settlement = district;
-
-            var compact = [settlement, region, country].filter(Boolean).join(', ');
-
-            state.currentAddress = compact || englishPlaceLabelFromNominatim(data) || null;
-            if (state.currentAddress) setCachedReverseLabel(lat, lon, state.currentAddress);
-
-            // Update header context immediately after reverse geocoding resolves
+    reverseGeocodeLatLonToAddress(lat, lon)
+        .then((label) => {
+            if (!label) return;
+            state.currentAddress = label;
             var methodName = state.lastTodayData && state.lastTodayData.meta && state.lastTodayData.meta.method && state.lastTodayData.meta.method.name
                 ? state.lastTodayData.meta.method.name
                 : '—';
             setResultsContext(getDisplayLocation(), methodName);
             updateMethodRecommendation();
+            refreshSiteHeaderToolsNav();
         })
         .catch(() => {
-            // If reverse geocoding fails, keep "Your location" as a fallback.
+            /* keep coords-only label */
         });
 }
 
@@ -276,6 +316,11 @@ export function useCity() {
         return;
     }
     closeSuggestions();
+    if (locationUiNavigateAfterPick) {
+        setStatus('Loading…', 'success');
+        locationUiNavigateAfterPick(city);
+        return;
+    }
     state.currentAddress = city;
     state.currentCoords = null;
     state.useCoordinates = false;
@@ -283,18 +328,25 @@ export function useCity() {
     replaceBrowserUrlWithCity(city);
     updateMethodRecommendation();
     fetchPrayerTimes();
+    refreshSiteHeaderToolsNav();
 }
 
 /**
  * Attaches all location-related listeners: GPS button, search button, suggestion
  * keyboard/mouse behavior, and click-outside to close the dropdown.
+ * @param {{ navigateAfterPick?: (address: string) => void }} [options] — on tool pages, navigate instead of home SPA.
  */
-export function bindLocationUI() {
+export function bindLocationUI(options) {
+    locationUiNavigateAfterPick = options && typeof options.navigateAfterPick === 'function' ? options.navigateAfterPick : null;
+
     const inputCity = $('input-city');
     const suggestionsDropdown = $('suggestions-dropdown');
+    const btnUse = $('btn-use-location');
+    const btnSearch = $('btn-search-city');
+    if (!btnUse || !btnSearch) return;
 
-    $('btn-use-location').addEventListener('click', useLocation);
-    $('btn-search-city').addEventListener('click', useCity);
+    btnUse.addEventListener('click', useLocation);
+    btnSearch.addEventListener('click', useCity);
 
     if (inputCity) {
         inputCity.addEventListener('input', onCityInput);
@@ -334,7 +386,9 @@ export function bindLocationUI() {
         if (suggestionsDropdown && inputCity && !suggestionsDropdown.contains(e.target) && e.target !== inputCity) closeSuggestions();
     });
 
-    window.addEventListener('popstate', applyCityFromCurrentUrl);
+    if (!locationUiNavigateAfterPick) {
+        window.addEventListener('popstate', applyCityFromCurrentUrl);
+    }
 }
 
 /** If the page was opened with `?city=…`, run the same flow as a manual city search. */

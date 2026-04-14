@@ -103,11 +103,15 @@ if (isset($data['code']) && $data['code'] !== 200) {
 $final = [
     'success' => true,
     'data' => $data['data'],
-    'meta' => $data['meta'] ?? null
+    'meta' => $data['meta'] ?? null,
+    'provider' => 'aladhan',
+    'fetchedAt' => time()
 ];
 header('X-Esajda-Cache: ' . (($db !== null && $cityId !== null) ? 'miss' : 'bypass'));
 if ($db !== null && $cityId !== null) {
     cacheDbWritePayload($db, $cityId, 'prayer', $variantKey, $final, $ttlSeconds);
+    // Store full upstream JSON too, so future UI can use more fields offline.
+    cacheDbWritePayload($db, $cityId, 'prayer_raw', $variantKey, $data, $ttlSeconds);
     esajdaServerLog('api', 'response fresh from Aladhan + DB write ttl=' . $ttlSeconds . 's');
 } else {
     esajdaServerLog('api', 'response fresh from Aladhan (no DB cache)');
