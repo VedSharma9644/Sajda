@@ -6,7 +6,7 @@
 
 import { $, show, hide, syncWeatherSunstrip } from './dom.js';
 import { getDisplayLocation, escapeHtml } from './utils.js';
-import { fetchWeatherForCurrentSelection } from './weather-api.js?v=25';
+import { fetchWeatherForCurrentSelection } from './weather-api.js?v=27';
 import { state } from './state.js';
 import { stripTimeToken } from './sun-times.js';
 import { readLocationPathPrefix, pageHref } from './page-location.js';

@@ -15,7 +15,7 @@
     <title>Weather | e-Sajda</title>
     <meta name="description" content="Current weather for your city.">
     <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="/style.css?v=39">
+    <link rel="stylesheet" href="/style.css?v=50">
 </head>
 <body>
     <div class="app">
@@ -134,14 +134,6 @@
                 <div id="weather-extras-grid" class="weather-extras-grid"></div>
             </section>
 
-            <section id="major-cities" class="card hidden" aria-label="Major cities">
-                <div class="card-head">
-                    <h3 class="card-title" id="major-cities-title">Major cities</h3>
-                    <p class="card-subtitle" id="major-cities-sub"></p>
-                </div>
-                <div id="major-cities-list" class="time-other-cities-list" aria-label="Major cities list"></div>
-            </section>
-
             <section id="country-cities" class="card hidden" aria-label="Major cities in country">
                 <div class="card-head">
                     <h3 class="card-title" id="country-cities-title">Major cities in country</h3>
@@ -149,11 +141,19 @@
                 </div>
                 <div id="country-cities-list" class="time-other-cities-list" aria-label="Major cities in country list"></div>
             </section>
+
+            <section id="major-cities" class="card hidden" aria-label="Major cities">
+                <div class="card-head">
+                    <h3 class="card-title" id="major-cities-title">Major cities</h3>
+                    <p class="card-subtitle" id="major-cities-sub"></p>
+                </div>
+                <div id="major-cities-list" class="time-other-cities-list" aria-label="Major cities list"></div>
+            </section>
             <p id="weather-page-error" class="status error hidden">Could not load weather for this place.</p>
         </main>
     </div>
-    <script src="/js/site-header-nav.js?v=3" type="module"></script>
-    <script src="/js/site-location-panel.js?v=1" type="module"></script>
-    <script src="/js/weather-page.js?v=7" type="module"></script>
+    <script src="/js/site-header-nav.js?v=4" type="module"></script>
+    <script src="/js/site-location-panel.js?v=4" type="module"></script>
+    <script src="/js/weather-page.js?v=10" type="module"></script>
 </body>
 </html>

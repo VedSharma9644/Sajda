@@ -9,13 +9,13 @@
 import { state } from './state.js';
 import { $, show, hide } from './dom.js';
 import { escapeHtml, getDisplayLocation, englishPlaceLabelFromNominatim } from './utils.js';
-import { setStatus, setResultsContext, showLoading } from './render.js?v=25';
+import { setStatus, setResultsContext, showLoading } from './render.js?v=27';
 import { updateMethodRecommendation } from './recommendations.js';
 import { fetchPrayerTimes } from './api.js';
 import { replaceBrowserUrlWithCity, clearCityFromBrowserUrl, readCityFromUrl } from './location-routing.js';
-import { refreshSiteHeaderToolsNav } from './site-header-nav.js?v=3';
+import { refreshSiteHeaderToolsNav } from './site-header-nav.js?v=4';
 import { getCachedSuggestions, setCachedSuggestions, getCachedReverseLabel, setCachedReverseLabel } from './location-cache.js';
-import { esajdaLog } from './debug-log.js?v=21';
+import { esajdaLog } from './debug-log.js?v=22';
 
 /** When set by `bindLocationUI({ navigateAfterPick })`, city/GPS picks full-page navigate instead of SPA home flow. */
 let locationUiNavigateAfterPick = null;
@@ -169,6 +169,23 @@ function selectHighlighted() {
 }
 
 /**
+ * Maps `GeolocationPositionError` to a short user-facing string.
+ * The old generic “Could not get location.” was shown for every error except codes 1 and 2;
+ * on phones that is usually code 3 (TIMEOUT) with `enableHighAccuracy: true` and a 10s cap.
+ * @param {GeolocationPositionError} err
+ */
+function geolocationErrorUserMessage(err) {
+    const code = err && typeof err.code === 'number' ? err.code : -1;
+    const hint = err && typeof err.message === 'string' && err.message.trim() ? ' (' + err.message.trim() + ')' : '';
+    if (code === 1) return 'Location permission denied.';
+    if (code === 2) return 'Location unavailable.' + hint;
+    if (code === 3) {
+        return 'Location timed out (GPS was not ready in time). Try again near a window or outdoors, or check that Wi‑Fi and location services are on.';
+    }
+    return 'Could not get location (error code ' + code + ').' + hint;
+}
+
+/**
  * “Use my location”: requests GPS coords, stores them, fetches times immediately,
  * then improves the label via `reverseGeocodeAndUpdateLocation`.
  */
@@ -180,10 +197,11 @@ export function useLocation() {
     }
     const onErr = (err) => {
         state.currentCoords = null;
-        const msg = err.code === 1 ? 'Location permission denied.'
-            : err.code === 2 ? 'Location unavailable.'
-            : 'Could not get location.';
-        setStatus(msg, 'error');
+        esajdaLog('geo', 'getCurrentPosition failed', {
+            code: err && err.code,
+            message: err && err.message,
+        });
+        setStatus(geolocationErrorUserMessage(err), 'error');
         showLoading(false);
     };
 

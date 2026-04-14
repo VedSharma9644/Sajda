@@ -41,11 +41,11 @@
   # - /{city} → /pages/time.html
   # Keep assets and known endpoints intact.
   RewriteCond %{REQUEST_URI} !^/(css|js|pages|sun-chart|prayer-times)(/|$) [NC]
-  RewriteCond %{REQUEST_URI} !^/(api\.php|weather\.php|geocode\.php|time-meta\.php|region-cities\.php|cache-clean\.php|sun-year\.php|sun-day\.php|style\.css)$ [NC]
+  RewriteCond %{REQUEST_URI} !^/(api\.php|weather\.php|geocode\.php|time-meta\.php|region-cities\.php|country-cities\.php|popular-cities\.php|country-info\.php|cache-clean\.php|sun-year\.php|sun-day\.php|style\.css)$ [NC]
   RewriteRule ^[^/]+/[^/]+/?$ /pages/time.html [L,NC]
 
   RewriteCond %{REQUEST_URI} !^/(css|js|pages|sun-chart|prayer-times)(/|$) [NC]
-  RewriteCond %{REQUEST_URI} !^/(api\.php|weather\.php|geocode\.php|time-meta\.php|region-cities\.php|cache-clean\.php|sun-year\.php|sun-day\.php|style\.css)$ [NC]
+  RewriteCond %{REQUEST_URI} !^/(api\.php|weather\.php|geocode\.php|time-meta\.php|region-cities\.php|country-cities\.php|popular-cities\.php|country-info\.php|cache-clean\.php|sun-year\.php|sun-day\.php|style\.css)$ [NC]
   RewriteRule ^[^/]+/?$ /pages/time.html [L,NC]
 
   RewriteRule ^[^/]+/[^/]+/style\.css$ /style.css [L,NC]
@@ -56,6 +56,9 @@
   RewriteRule ^[^/]+/[^/]+/geocode\.php$ /geocode.php [L,NC]
   RewriteRule ^[^/]+/[^/]+/time-meta\.php$ /time-meta.php [L,NC]
   RewriteRule ^[^/]+/[^/]+/region-cities\.php$ /region-cities.php [L,NC]
+  RewriteRule ^[^/]+/[^/]+/country-cities\.php$ /country-cities.php [L,NC]
+  RewriteRule ^[^/]+/[^/]+/popular-cities\.php$ /popular-cities.php [L,NC]
+  RewriteRule ^[^/]+/[^/]+/country-info\.php$ /country-info.php [L,NC]
   RewriteRule ^[^/]+/[^/]+/weather\.php$ /weather.php [L,NC]
   RewriteRule ^[^/]+/[^/]+/api\.php$ /api.php [L,NC]
   RewriteRule ^[^/]+/[^/]+/cache-clean\.php$ /cache-clean.php [L,NC]
@@ -68,6 +71,9 @@
   RewriteRule ^[^/]+/geocode\.php$ /geocode.php [L,NC]
   RewriteRule ^[^/]+/time-meta\.php$ /time-meta.php [L,NC]
   RewriteRule ^[^/]+/region-cities\.php$ /region-cities.php [L,NC]
+  RewriteRule ^[^/]+/country-cities\.php$ /country-cities.php [L,NC]
+  RewriteRule ^[^/]+/popular-cities\.php$ /popular-cities.php [L,NC]
+  RewriteRule ^[^/]+/country-info\.php$ /country-info.php [L,NC]
   RewriteRule ^[^/]+/weather\.php$ /weather.php [L,NC]
   RewriteRule ^[^/]+/api\.php$ /api.php [L,NC]
   RewriteRule ^[^/]+/cache-clean\.php$ /cache-clean.php [L,NC]

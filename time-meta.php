@@ -48,34 +48,11 @@ if ($db !== null) {
     }
 }
 
-// 1) Timezone + coords via Aladhan timingsByAddress (method=4) for today.
+// 1–2) Aladhan (tz/coords) + Nominatim (region/country, coords fallback) in parallel when cURL is available.
 $today = date('d-m-Y');
 $aladhanUrl = 'https://api.aladhan.com/v1/timingsByAddress/' . urlencode($today)
     . '?address=' . urlencode($address)
     . '&method=4';
-
-$tz = '';
-$lat = null;
-$lon = null;
-
-esajdaServerLog('time_meta', 'upstream GET Aladhan for tz/coords');
-$body = fetchTimeMetaUrl($aladhanUrl);
-if ($body !== null) {
-    $j = json_decode($body, true);
-    if (is_array($j) && isset($j['code']) && (int)$j['code'] === 200) {
-        $meta = $j['data']['meta'] ?? null;
-        if (is_array($meta)) {
-            $tz = isset($meta['timezone']) ? (string)$meta['timezone'] : '';
-            if (isset($meta['latitude'])) $lat = (float)$meta['latitude'];
-            if (isset($meta['longitude'])) $lon = (float)$meta['longitude'];
-        }
-    }
-}
-
-// 2) Region/country via Nominatim (addressdetails)
-$region = '';
-$country = '';
-$countryCode = '';
 
 $nomUrl = 'https://nominatim.openstreetmap.org/search?'
     . http_build_query([
@@ -85,8 +62,34 @@ $nomUrl = 'https://nominatim.openstreetmap.org/search?'
         'limit' => '1',
     ]);
 
-esajdaServerLog('time_meta', 'upstream GET Nominatim for region/country');
-$nomBody = fetchTimeMetaUrl($nomUrl);
+$tz = '';
+$lat = null;
+$lon = null;
+$region = '';
+$country = '';
+$countryCode = '';
+
+esajdaServerLog('time_meta', 'upstream GET Aladhan + Nominatim (parallel)');
+$pair = fetchTimeMetaParallel($aladhanUrl, $nomUrl);
+$body = $pair[0];
+$nomBody = $pair[1];
+
+if ($body !== null) {
+    $j = json_decode($body, true);
+    if (is_array($j) && isset($j['code']) && (int)$j['code'] === 200) {
+        $meta = $j['data']['meta'] ?? null;
+        if (is_array($meta)) {
+            $tz = isset($meta['timezone']) ? (string)$meta['timezone'] : '';
+            if (isset($meta['latitude'])) {
+                $lat = (float)$meta['latitude'];
+            }
+            if (isset($meta['longitude'])) {
+                $lon = (float)$meta['longitude'];
+            }
+        }
+    }
+}
+
 if ($nomBody !== null) {
     $arr = json_decode($nomBody, true);
     if (is_array($arr) && isset($arr[0]) && is_array($arr[0])) {
@@ -95,9 +98,12 @@ if ($nomBody !== null) {
         $country = (string)($addr['country'] ?? '');
         $countryCode = strtolower((string)($addr['country_code'] ?? ''));
 
-        // If Aladhan didn't provide coords, use Nominatim.
-        if ($lat === null && isset($arr[0]['lat'])) $lat = (float)$arr[0]['lat'];
-        if ($lon === null && isset($arr[0]['lon'])) $lon = (float)$arr[0]['lon'];
+        if ($lat === null && isset($arr[0]['lat'])) {
+            $lat = (float)$arr[0]['lat'];
+        }
+        if ($lon === null && isset($arr[0]['lon'])) {
+            $lon = (float)$arr[0]['lon'];
+        }
     }
 }
 
@@ -124,6 +130,95 @@ if ($db !== null && $cityId !== null) {
     cacheDbUpsertCity($db, $cityKey, $address, $lat, $lon, $tz);
 }
 echo json_encode(['success' => true, 'data' => $payload]);
+
+/**
+ * @return array{0: ?string, 1: ?string} [aladhanBody, nominatimBody]
+ */
+function fetchTimeMetaParallel(string $urlA, string $urlB): array
+{
+    if (!function_exists('curl_init') || !function_exists('curl_multi_init')) {
+        return [fetchTimeMetaUrl($urlA), fetchTimeMetaUrl($urlB)];
+    }
+
+    $commonOpts = [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_TIMEOUT => 20,
+        CURLOPT_CONNECTTIMEOUT => 15,
+        CURLOPT_HTTPHEADER => [
+            'Accept: application/json',
+            'Accept-Language: en',
+            'User-Agent: e-Sajda/1.0 (Time Meta)',
+        ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_ENCODING => '',
+    ];
+
+    $mh = curl_multi_init();
+    if ($mh === false) {
+        return [fetchTimeMetaUrl($urlA), fetchTimeMetaUrl($urlB)];
+    }
+
+    $chA = curl_init($urlA);
+    $chB = curl_init($urlB);
+    if ($chA === false || $chB === false) {
+        curl_multi_close($mh);
+        return [fetchTimeMetaUrl($urlA), fetchTimeMetaUrl($urlB)];
+    }
+
+    curl_setopt_array($chA, $commonOpts);
+    curl_setopt_array($chB, $commonOpts);
+    curl_multi_add_handle($mh, $chA);
+    curl_multi_add_handle($mh, $chB);
+
+    $running = 0;
+    do {
+        $stat = curl_multi_exec($mh, $running);
+    } while ($stat === CURLM_CALL_MULTI_PERFORM);
+
+    while ($running > 0 && $stat === CURLM_OK) {
+        $sel = curl_multi_select($mh, 1.0);
+        if ($sel === -1) {
+            usleep(1000);
+        }
+        do {
+            $stat = curl_multi_exec($mh, $running);
+        } while ($stat === CURLM_CALL_MULTI_PERFORM);
+    }
+
+    $outA = null;
+    $outB = null;
+    if (curl_errno($chA) === 0) {
+        $b = curl_multi_getcontent($chA);
+        if ($b !== false && $b !== '') {
+            $outA = $b;
+        }
+    }
+    if (curl_errno($chB) === 0) {
+        $b = curl_multi_getcontent($chB);
+        if ($b !== false && $b !== '') {
+            $outB = $b;
+        }
+    }
+
+    curl_multi_remove_handle($mh, $chA);
+    curl_multi_remove_handle($mh, $chB);
+    curl_close($chA);
+    curl_close($chB);
+    curl_multi_close($mh);
+
+    // cURL multi can report errno 0 with empty bodies when TLS/CA is misconfigured (common on local PHP).
+    // `fetchTimeMetaUrl` falls back to `file_get_contents` with the same relaxed SSL path as single requests.
+    if ($outA === null || $outA === '') {
+        $outA = fetchTimeMetaUrl($urlA);
+    }
+    if ($outB === null || $outB === '') {
+        $outB = fetchTimeMetaUrl($urlB);
+    }
+
+    return [$outA, $outB];
+}
 
 function fetchTimeMetaUrl($url) {
     if (function_exists('curl_init')) {

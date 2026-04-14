@@ -38,7 +38,9 @@ if (!is_numeric($latitude) || !is_numeric($longitude)) {
 }
 
 $cityKey = cacheDbCityKeyByCoords((float)$latitude, (float)$longitude);
-$ttlSeconds = 36000; // 10 hours (match prayer cache policy)
+// Keep served copy longer: main forecast + hourly/daily + forecastExtras (marine/AQ)
+// are written as one payload to SQLite so repeat visits avoid upstream entirely.
+$ttlSeconds = 86400; // 24 hours
 esajdaServerLog('weather', 'request lat=' . $latitude . ' lon=' . $longitude);
 $db = cacheDbOpen();
 $cityId = null;

@@ -3,6 +3,24 @@
     display: none;
 }
 
+.results-section {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.timings-month {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.timings-today {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
 .results-header {
     margin-bottom: 1rem;
 }
@@ -229,12 +247,23 @@
 
 /* ----- Month table ----- */
 .table-wrap {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     overflow-x: auto;
+    overflow-y: visible;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x pan-y;
+    border-radius: 8px;
+    outline: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
 }
 
 .prayer-table {
-    width: 100%;
+    width: max(100%, 36rem);
+    min-width: 36rem;
     border-collapse: collapse;
     font-size: 0.9rem;
 }
@@ -260,6 +289,19 @@
 
 .prayer-table tbody tr:hover {
     background: var(--bg-input);
+}
+
+/* Single-prayer pages (/…/prayer-times/fajr etc.): 3-column schedule — stay within card; scroll inside .table-wrap only if content forces */
+.prayer-table:has(#seven-day-body) {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.prayer-table:has(#seven-day-body) th,
+.prayer-table:has(#seven-day-body) td {
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .prayer-detail-section {
@@ -291,4 +333,33 @@
 
 .prayer-detail-about {
     margin-top: 0.75rem;
+}
+
+/* Today strip: next-prayer banner full width, then prayer tiles 2+2+1 on narrow screens */
+@media (max-width: 720px) {
+    #today-timings {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem;
+        min-width: 0;
+    }
+
+    #today-timings #next-prayer-box {
+        grid-column: 1 / -1;
+        margin-bottom: 0;
+    }
+
+    #today-timings .prayer-list {
+        display: contents;
+    }
+
+    #today-timings .prayer-list > li {
+        aspect-ratio: auto;
+        min-height: 4.1rem;
+    }
+
+    #today-timings .prayer-list > li:last-child {
+        grid-column: 1 / -1;
+        min-height: 3.5rem;
+    }
 }

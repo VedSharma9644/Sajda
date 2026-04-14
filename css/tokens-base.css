@@ -174,9 +174,12 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    max-width: 1280px;
+    width: 100%;
+    max-width: min(1280px, 100%);
     margin: 0 auto;
     padding: 1.5rem;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 /* ----- Theme toggle (positioned in .site-header via site-header.css) ----- */
@@ -226,6 +229,8 @@ body {
 /* ----- Main ----- */
 .main {
     flex: 1;
+    min-width: 0;
+    max-width: 100%;
 }
 
 /* ----- Cards ----- */

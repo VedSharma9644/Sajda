@@ -20,10 +20,16 @@
 .prayer-page-main {
     display: grid;
     gap: 0.9rem;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .prayer-page-card {
     padding: 1.1rem 1.2rem;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .prayer-top-actions {
@@ -135,7 +141,9 @@
 }
 
 .method-select-wrap {
-    min-width: 240px;
+    min-width: 0;
+    max-width: 100%;
+    width: min(100%, 28rem);
 }
 
 .method-select-wrap select {
@@ -168,7 +176,7 @@
 
 .daily-times {
     display: grid;
-    grid-template-columns: repeat(6, minmax(100px, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 0.45rem;
     margin-top: 0.9rem;
 }
@@ -349,7 +357,7 @@ a.prayer-hub-card:hover {
 .prayer-hub-hero-meta {
     margin-top: 1rem;
     display: grid;
-    grid-template-columns: repeat(4, minmax(10rem, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0.6rem;
 }
 
@@ -430,7 +438,13 @@ a.prayer-hub-card:hover {
 
 @media (max-width: 900px) {
     .prayer-hub-hero-meta {
-        grid-template-columns: repeat(2, minmax(10rem, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .prayer-hub-hero-meta {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -441,6 +455,8 @@ a.prayer-hub-card:hover {
     justify-content: space-between;
     gap: 0.75rem;
     margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+    min-width: 0;
 }
 
 .schedule-head h3 {
@@ -465,6 +481,9 @@ a.prayer-hub-card:hover {
     display: inline-flex;
     align-items: center;
     gap: 0.65rem;
+    flex-wrap: wrap;
+    min-width: 0;
+    max-width: 100%;
 }
 
 /* Segmented control (calendar type) */
@@ -524,6 +543,9 @@ a.prayer-hub-card:hover {
     margin-bottom: 0.85rem;
     padding-bottom: 0.85rem;
     border-bottom: 1px solid var(--border);
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .hub-prayer-toolbar-right .options-row {

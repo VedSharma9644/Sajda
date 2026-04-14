@@ -9,9 +9,9 @@ import { PRAYERS } from './config.js';
 import { state } from './state.js';
 import { $, show } from './dom.js';
 import { timeToMinutes } from './utils.js';
-import { setStatus } from './render.js?v=25';
+import { setStatus } from './render.js?v=27';
 import { buildComparisonParams } from './api.js';
-import { esajdaLog } from './debug-log.js?v=21';
+import { esajdaLog } from './debug-log.js?v=22';
 
 /** Fills the comparison table and shows the panel. `current` is the user’s method; `karachi` is method 1. */
 export function renderComparison(current, karachi) {

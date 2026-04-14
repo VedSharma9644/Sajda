@@ -9,8 +9,8 @@
 import { state } from './state.js';
 import { $ } from './dom.js';
 import { getTimezone, getTodayDate } from './utils.js';
-import { showLoading, onApiResponse } from './render.js?v=25';
-import { esajdaLog } from './debug-log.js?v=21';
+import { showLoading, onApiResponse } from './render.js?v=27';
+import { esajdaLog } from './debug-log.js?v=22';
 
 function readAllMethodIdsFromDom() {
     const sel = $('select-method');
@@ -61,12 +61,12 @@ function prefetchOtherMethodsInBackground(baseParams) {
         const others = all.filter((m) => m !== current);
         if (!others.length) return;
 
-        // Limit to avoid hammering upstream. Order: nearby/common methods first.
-        const maxPrefetch = 8;
+        // Limit parallel upstream work: each prefetch is a real /api.php miss until cached.
+        const maxPrefetch = 3;
         const list = others.slice(0, maxPrefetch);
 
         let idx = 0;
-        const concurrency = 2;
+        const concurrency = 1;
         let inFlight = 0;
 
         function next() {

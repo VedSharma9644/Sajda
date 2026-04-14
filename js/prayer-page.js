@@ -1,5 +1,4 @@
-import { englishPlaceLabelFromNominatim } from './utils.js';
-import { esajdaLog } from './debug-log.js?v=21';
+import { esajdaLog } from './debug-log.js?v=22';
 import { initThemeToggle } from './theme.js';
 import { initMajorCities } from './major-cities.js';
 
@@ -167,19 +166,16 @@ function readRoute() {
 
 async function fetchCityLabel(city) {
     if (!city) return city;
-    const url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(city) + '&format=json&addressdetails=1&namedetails=1&limit=1';
-    esajdaLog('nominatim', 'GET search (prayer page label)', { city });
     try {
-        const res = await fetch(url, {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Accept-Language': 'en',
-                'User-Agent': 'e-Sajda/1.0 (Prayer Times)'
-            }
-        });
-        const data = await res.json();
-        if (Array.isArray(data) && data[0]) return englishPlaceLabelFromNominatim(data[0]) || city;
+        const url = '/geocode.php?address=' + encodeURIComponent(city);
+        esajdaLog('geo', 'GET /geocode.php (prayer page label)', { city });
+        const res = await fetch(url, { method: 'GET', credentials: 'same-origin', headers: { Accept: 'application/json' } });
+        if (!res.ok) return city;
+        const j = await res.json();
+        if (j && j.success && j.data && typeof j.data.displayName === 'string') {
+            const d = j.data.displayName.trim();
+            if (d) return d;
+        }
     } catch (_) {
         /* ignore and keep input city */
     }

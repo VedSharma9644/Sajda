@@ -2,7 +2,7 @@ import { readLocationFromPageUrl } from './page-location.js';
 import { initThemeToggle } from './theme.js';
 import { state } from './state.js';
 import { $, show, hide } from './dom.js';
-import { refreshWeatherWidget } from './weather-widget.js?v=30';
+import { refreshWeatherWidget } from './weather-widget.js?v=32';
 import { initMajorCities } from './major-cities.js';
 
 function main() {

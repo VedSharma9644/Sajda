@@ -1,28 +1,86 @@
 /* ----- Responsive ----- */
+@media (max-width: 720px) {
+    .schedule-label {
+        white-space: normal;
+    }
+
+    .time-other-city-link {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    select,
+    input[type='text'] {
+        max-width: 100%;
+    }
+
+    .prayer-hub-hero-top {
+        flex-wrap: wrap;
+        min-width: 0;
+    }
+
+    .prayer-hub-title {
+        overflow-wrap: anywhere;
+    }
+
+    .hub-prayer-toolbar {
+        min-width: 0;
+    }
+
+    /* Location strip (prayer hub, time, sun, etc.): stack so row layout cannot overflow */
+    .location-actions {
+        flex-direction: column;
+        align-items: stretch;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .location-actions > .btn {
+        width: 100%;
+        max-width: 100%;
+        justify-content: center;
+        box-sizing: border-box;
+    }
+
+    .location-actions > .or {
+        align-self: center;
+        text-align: center;
+    }
+
+    .city-input-wrap {
+        flex-direction: column;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .city-input-wrap .btn-secondary {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+}
+
 @media (max-width: 600px) {
     .app {
         padding: 1rem;
+    }
+
+    .card {
+        padding: 1rem 1.1rem;
+    }
+
+    .card-subtitle {
+        flex: 1 1 auto;
+        margin-left: 0;
+        text-align: left;
     }
 
     .site-header-logo {
         font-size: 1.55rem;
     }
 
-    .location-actions {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .city-input-wrap {
-        flex-direction: column;
-    }
-
-    .city-input-wrap input {
-        min-width: 0;
-    }
-
     .options-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .month-picker {

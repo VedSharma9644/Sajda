@@ -69,6 +69,11 @@ if ($uri === '/popular-cities.php') {
     return true;
 }
 
+if ($uri === '/country-info.php') {
+    require __DIR__ . '/country-info.php';
+    return true;
+}
+
 if ($uri === '/cache-clean.php') {
     require __DIR__ . '/cache-clean.php';
     return true;
@@ -139,6 +144,7 @@ if (preg_match('#^/([^/]+)/?$#i', $uri, $m)) {
         $seg0 !== 'style.css' &&
         $seg0 !== 'country-cities.php' &&
         $seg0 !== 'popular-cities.php' &&
+        $seg0 !== 'country-info.php' &&
         $seg0 !== 'cache-clean.php' &&
         $seg0 !== 'sun-year.php' &&
         $seg0 !== 'sun-day.php' &&

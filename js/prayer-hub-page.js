@@ -7,6 +7,7 @@ import { PRAYERS, MONTHS } from './config.js';
 import { state } from './state.js';
 import { $, show, hide } from './dom.js';
 import { updateNextPrayerUI, startNextPrayerTick, stopNextPrayerTick } from './next-prayer.js';
+import { initMajorCities } from './major-cities.js';
 
 let locRef = null;
 let prayerHubClockInterval = null;
@@ -599,6 +600,7 @@ async function load() {
             const data = await fetchToday(locRef.address, method);
             renderTodayView(data);
         }
+        void initMajorCities(locRef.address);
     } catch (e) {
         showError(e && e.message ? e.message : 'Could not load prayer times.');
     }

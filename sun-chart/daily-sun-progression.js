@@ -6,7 +6,7 @@
  */
 
 import { state } from '../js/state.js';
-import { resolveSelectedCoords } from '../js/weather-api.js?v=25';
+import { resolveSelectedCoords } from '../js/weather-api.js?v=27';
 
 const SECTION_ID = 'daily-sun-progression-section';
 const DATE_SPAN_ID = 'dailyProgressionChartDate';

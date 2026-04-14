@@ -29,7 +29,7 @@ export function applyTheme(theme) {
         /* ignore */
     }
     syncThemeToggleUI();
-    import('../sun-chart/sun-chart-entry.js?v=6')
+    import('../sun-chart/sun-chart-entry.js?v=7')
         .then((m) => m.restyleYearlySunChartForTheme())
         .catch(() => {
             /* sun chart optional */

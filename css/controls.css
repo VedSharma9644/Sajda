@@ -11,6 +11,32 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.location-section {
+    min-width: 0;
+    max-width: 100%;
+}
+
+/* All control cards (homepage location panel, hub method, site strip): stay in viewport */
+.controls.card {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.controls.card .form-group {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.controls.card select {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .btn {
@@ -65,13 +91,15 @@
     flex-wrap: wrap;
     gap: 0.5rem;
     flex: 1;
-    min-width: 200px;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .city-input-autocomplete {
     position: relative;
     flex: 1;
-    min-width: 180px;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .city-input-wrap input {
@@ -150,9 +178,11 @@
 /* ----- Form groups ----- */
 .options-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 1rem;
     margin-top: 1.25rem;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .form-group {

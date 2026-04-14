@@ -15,7 +15,7 @@
     <title>Sun & twilight | e-Sajda</title>
     <meta name="description" content="Sunrise, sunset, yearly chart, and sun path for your location.">
     <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="/style.css?v=32">
+    <link rel="stylesheet" href="/style.css?v=50">
 </head>
 <body>
     <div class="app">
@@ -103,22 +103,6 @@
                 </div>
             </div>
 
-            <section id="major-cities" class="card hidden" aria-label="Major cities">
-                <div class="card-head">
-                    <h3 class="card-title" id="major-cities-title">Major cities</h3>
-                    <p class="card-subtitle" id="major-cities-sub"></p>
-                </div>
-                <div id="major-cities-list" class="time-other-cities-list" aria-label="Major cities list"></div>
-            </section>
-
-            <section id="country-cities" class="card hidden" aria-label="Major cities in country">
-                <div class="card-head">
-                    <h3 class="card-title" id="country-cities-title">Major cities in country</h3>
-                    <p class="card-subtitle" id="country-cities-sub"></p>
-                </div>
-                <div id="country-cities-list" class="time-other-cities-list" aria-label="Major cities in country list"></div>
-            </section>
-
             <section id="sun-month-calendar-section" class="sun-month-calendar-section card hidden" aria-labelledby="sun-month-calendar-title">
                 <div class="sun-month-calendar-toolbar">
                     <h3 id="sun-month-calendar-title" class="sun-month-calendar-title">Monthly sun calendar</h3>
@@ -144,11 +128,27 @@
                 </div>
             </section>
 
+            <section id="country-cities" class="card hidden" aria-label="Major cities in country">
+                <div class="card-head">
+                    <h3 class="card-title" id="country-cities-title">Major cities in country</h3>
+                    <p class="card-subtitle" id="country-cities-sub"></p>
+                </div>
+                <div id="country-cities-list" class="time-other-cities-list" aria-label="Major cities in country list"></div>
+            </section>
+
+            <section id="major-cities" class="card hidden" aria-label="Major cities">
+                <div class="card-head">
+                    <h3 class="card-title" id="major-cities-title">Major cities</h3>
+                    <p class="card-subtitle" id="major-cities-sub"></p>
+                </div>
+                <div id="major-cities-list" class="time-other-cities-list" aria-label="Major cities list"></div>
+            </section>
+
             <p id="sun-page-error" class="status error hidden">Could not load sun data for this place.</p>
         </main>
     </div>
-    <script src="/js/site-header-nav.js?v=3" type="module"></script>
-    <script src="/js/site-location-panel.js?v=1" type="module"></script>
-    <script src="/js/sun-page.js?v=4" type="module"></script>
+    <script src="/js/site-header-nav.js?v=4" type="module"></script>
+    <script src="/js/site-location-panel.js?v=4" type="module"></script>
+    <script src="/js/sun-page.js?v=6" type="module"></script>
 </body>
 </html>

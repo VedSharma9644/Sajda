@@ -2,8 +2,8 @@ import { readLocationFromPageUrl } from './page-location.js';
 import { initThemeToggle } from './theme.js';
 import { state } from './state.js';
 import { $, show, hide } from './dom.js';
-import { renderSunTimesWidget } from './sun-times-widget.js?v=25';
-import { refreshYearlySunChart } from '../sun-chart/sun-chart-entry.js?v=6';
+import { renderSunTimesWidget } from './sun-times-widget.js?v=26';
+import { refreshYearlySunChart } from '../sun-chart/sun-chart-entry.js?v=7';
 import {
     refreshSunMonthTable,
     hideSunMonthTable,
@@ -11,7 +11,7 @@ import {
     readSunMonthCalendarFromForm,
     syncSunMonthRangeControls
 } from '../sun-chart/sun-month-table.js';
-import { resolveSelectedCoords } from './weather-api.js?v=25';
+import { resolveSelectedCoords } from './weather-api.js?v=27';
 import { hasSunTimesData } from './sun-times.js';
 import { initMajorCities } from './major-cities.js';
 

@@ -15,7 +15,7 @@
     <title>Local time | e-Sajda</title>
     <meta name="description" content="Clock and timezone for your city.">
     <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="/style.css?v=30">
+    <link rel="stylesheet" href="/style.css?v=50">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 </head>
 <body>
@@ -175,7 +175,7 @@
                         <h3 class="card-title">Time details</h3>
                         <p id="time-details-sub" class="card-subtitle"></p>
                     </div>
-                    <div class="results-grid" style="grid-template-columns: 1fr; gap: 0.5rem">
+                    <div class="results-grid">
                         <div class="result">
                             <div class="label">Lat/Long</div>
                             <div class="value" id="time-latlong">—</div>
@@ -234,9 +234,9 @@
             <p id="time-page-error" class="status error hidden">Could not resolve the timezone for this place.</p>
         </main>
     </div>
-    <script src="/js/site-header-nav.js?v=3" type="module"></script>
-    <script src="/js/site-location-panel.js?v=1" type="module"></script>
+    <script src="/js/site-header-nav.js?v=4" type="module"></script>
+    <script src="/js/site-location-panel.js?v=4" type="module"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="/js/time-page.js?v=3" type="module"></script>
+    <script src="/js/time-page.js?v=8" type="module"></script>
 </body>
 </html>

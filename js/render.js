@@ -14,9 +14,9 @@ import { updateNextPrayerUI, startNextPrayerTick, stopNextPrayerTick } from './n
 import { buildPrayerUrl, readPrayerFromUrl } from './location-routing.js';
 import { renderPrayerDetailPage, hidePrayerDetailPage, isPrayerDetailRoute } from './prayer-detail.js';
 import { startClockWidget, startLocalClockWidget } from './clock-widget.js';
-import { refreshWeatherWidget, hideWeatherWidget } from './weather-widget.js?v=30';
-import { renderSunTimesWidget, hideSunTimesWidget } from './sun-times-widget.js?v=25';
-import { refreshYearlySunChart, hideYearlySunChart } from '../sun-chart/sun-chart-entry.js?v=6';
+import { refreshWeatherWidget, hideWeatherWidget } from './weather-widget.js?v=32';
+import { renderSunTimesWidget, hideSunTimesWidget } from './sun-times-widget.js?v=26';
+import { refreshYearlySunChart, hideYearlySunChart } from '../sun-chart/sun-chart-entry.js?v=7';
 
 /** Status line under location controls (`success` / `error` add CSS classes). */
 export function setStatus(text, type) {

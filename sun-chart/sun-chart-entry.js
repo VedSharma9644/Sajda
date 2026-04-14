@@ -4,7 +4,7 @@
  * Wires DOM, loader, coords from app state, and chart modules in this folder.
  */
 
-import { resolveSelectedCoords } from '../js/weather-api.js?v=25';
+import { resolveSelectedCoords } from '../js/weather-api.js?v=27';
 import { state } from '../js/state.js';
 import { buildYearlySunSeries } from './solar-year.js';
 import { renderYearlySunChart, destroyYearlySunChart } from './chart-renderer.js';

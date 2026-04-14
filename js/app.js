@@ -9,25 +9,30 @@
 import { MONTHS } from './config.js';
 import { state } from './state.js';
 import { $, show, hide } from './dom.js';
-import { fetchPrayerTimes } from './api.js?v=26';
+import { fetchPrayerTimes } from './api.js?v=28';
 import { updateMethodRecommendation } from './recommendations.js';
 import { runCompareWithKarachi } from './comparison.js';
-import { useLocation, useCity, bindLocationUI, applyCityFromUrlOnStartup } from './location.js?v=22';
+import { useLocation, useCity, bindLocationUI, applyCityFromUrlOnStartup } from './location.js?v=25';
 import { clearLocationCache } from './location-cache.js';
 import { startLocalClockWidget } from './clock-widget.js';
-import { esajdaLog } from './debug-log.js?v=21';
-import { initThemeToggle } from './theme.js?v=2';
+import { esajdaLog } from './debug-log.js?v=22';
+import { initThemeToggle } from './theme.js?v=3';
 import { pathPrefixFromAddress } from './location-routing.js';
+import { prefetchThenAssign } from './time-prefetch.js?v=3';
 
 const FIRST_VISIT_LOCATION_PROMPT_KEY = 'esajda.location.prompted.v1';
 
+/** Go straight to /…/time; prefetch runs in parallel (see `time-prefetch.js`). */
 function navigateToTimePage(address) {
     const prefix = pathPrefixFromAddress(address);
-    if (prefix) {
-        window.location.assign('/' + prefix + '/time');
-        return;
+    const target = prefix ? '/' + prefix + '/time' : '/time';
+    const addr = String(address || '').trim();
+    const statusEl = document.getElementById('location-status');
+    if (statusEl) {
+        statusEl.textContent = 'Opening time page…';
+        statusEl.className = 'status';
     }
-    window.location.assign('/time');
+    prefetchThenAssign(addr, target);
 }
 
 /** Fills the month/year dropdowns for “This month” view with sensible defaults. */
@@ -67,7 +72,7 @@ function init() {
         if (state.currentCoords || state.currentAddress) fetchPrayerTimes();
     });
 
-    bindLocationUI({ navigateAfterPick: navigateToTimePage });
+    bindLocationUI({ navigateAfterPick: (addr) => void navigateToTimePage(addr) });
 
     const btnCompare = $('btn-compare-karachi');
     if (btnCompare) btnCompare.addEventListener('click', runCompareWithKarachi);

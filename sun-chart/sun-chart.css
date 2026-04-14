@@ -188,6 +188,9 @@
     .sun-bar-segments-wrapper {
         width: 100%;
     }
+    .daily-sun-bar-legend {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* --- Daily sun progression chart (altitude vs time) --- */
@@ -311,6 +314,11 @@ html[data-theme='dark'] .daily-sun-info-panel {
 
 .sun-month-calendar-section {
     margin-top: 1rem;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    /* Wide table scrolls inside .sun-month-table-scroll; clip any stray overflow */
+    overflow-x: hidden;
 }
 
 .sun-month-calendar-toolbar {
@@ -320,13 +328,17 @@ html[data-theme='dark'] .daily-sun-info-panel {
     justify-content: space-between;
     gap: 1rem;
     margin-bottom: 0.75rem;
+    max-width: 100%;
+    min-width: 0;
 }
 
 .sun-month-calendar-title {
     margin: 0;
     font-size: 1.05rem;
     font-weight: 650;
-    flex: 1 1 12rem;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .sun-month-calendar-controls {
@@ -334,6 +346,8 @@ html[data-theme='dark'] .daily-sun-info-panel {
     flex-wrap: wrap;
     align-items: flex-end;
     gap: 0.75rem 1rem;
+    max-width: 100%;
+    min-width: 0;
 }
 
 .sun-month-calendar-label {
@@ -354,7 +368,9 @@ html[data-theme='dark'] .daily-sun-info-panel {
 }
 
 .sun-month-calendar-select {
-    min-width: 8.5rem;
+    min-width: 0;
+    max-width: 100%;
+    width: 8.5rem;
     padding: 0.35rem 0.5rem;
     border-radius: 6px;
     border: 1px solid var(--border);
@@ -364,19 +380,27 @@ html[data-theme='dark'] .daily-sun-info-panel {
 }
 
 .sun-month-table-scroll {
+    display: block;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     overflow-x: auto;
+    overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x pan-y;
     border-radius: 8px;
     outline: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
 }
 
 .sun-month-table {
-    width: 100%;
+    width: max(100%, 920px);
     min-width: 920px;
     border-collapse: collapse;
     font-size: 0.78rem;
     text-align: center;
+    table-layout: auto;
 }
 
 .sun-month-table th,
@@ -444,5 +468,13 @@ html[data-theme='dark'] .sun-month-tr-today .sun-month-td-day {
 
     .sun-month-calendar-controls {
         justify-content: flex-start;
+    }
+
+    .sun-month-calendar-select {
+        width: 100%;
+    }
+
+    .sun-month-calendar-controls .btn {
+        width: 100%;
     }
 }

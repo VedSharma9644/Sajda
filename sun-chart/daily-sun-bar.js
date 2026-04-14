@@ -6,7 +6,7 @@
  */
 
 import { state } from '../js/state.js';
-import { resolveSelectedCoords } from '../js/weather-api.js?v=25';
+import { resolveSelectedCoords } from '../js/weather-api.js?v=27';
 import { buildYearlySunSeries } from './solar-year.js';
 
 const SECTION_ID = 'daily-sun-bar-section';

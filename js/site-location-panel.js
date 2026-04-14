@@ -3,7 +3,8 @@
  * Full navigation after pick (replaces the old header “Go” bar).
  */
 import { pathPrefixFromAddress, readCityFromUrl } from './location-routing.js';
-import { bindLocationUI } from './location.js?v=22';
+import { bindLocationUI } from './location.js?v=25';
+import { prefetchThenAssign } from './time-prefetch.js?v=3';
 
 const PRAYER_KEYS = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
 
@@ -32,7 +33,7 @@ function navigateTargetForAddress(address) {
     const last = parts.length ? parts[parts.length - 1].toLowerCase() : '';
 
     if (last === 'time' || last === 'times') {
-        window.location.assign('/' + prefix + '/time' + q);
+        void prefetchThenAssign(address, '/' + prefix + '/time' + q);
         return;
     }
     if (last === 'sun') {

@@ -8,12 +8,12 @@
  */
 
 import { state } from './state.js';
-import { esajdaLog } from './debug-log.js?v=21';
+import { esajdaLog } from './debug-log.js?v=22';
 
 const GEO_CACHE_KEY = 'esajda.weather.geo.v1';
 const WEATHER_CACHE_KEY = 'esajda.weather.data.v1';
 const GEO_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
-const WEATHER_TTL_MS = 10 * 60 * 60 * 1000; // 10 hours (aligned with weather.php SQLite TTL)
+const WEATHER_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours (aligned with weather.php SQLite TTL)
 
 function readStore(key, fallback) {
     try {
@@ -157,18 +157,28 @@ export async function fetchWeatherForCurrentSelection() {
     const weatherCache = readStore(WEATHER_CACHE_KEY, {});
     const cached = weatherCache[cacheId];
     if (cached && cached.expiresAt > now()) {
-        esajdaLog('weather', 'localStorage cache HIT; background refresh → /weather.php', { cacheId });
-        // Serve cached value instantly, but still ping server to keep shared DB cache warm.
-        fetchWeatherFromServer(coords.latitude, coords.longitude)
-            .then((fresh) => {
-                if (!fresh) return;
-                const latest = readStore(WEATHER_CACHE_KEY, {});
-                latest[cacheId] = { payload: fresh, expiresAt: now() + WEATHER_TTL_MS };
-                writeStore(WEATHER_CACHE_KEY, latest);
-            })
-            .catch(() => {
-                /* ignore background refresh failures */
-            });
+        // Server already persists full weather in SQLite; avoid hitting /weather.php on
+        // every navigation when the in-memory payload is still fresh enough.
+        const fetchedAtSec = cached.payload && typeof cached.payload.fetchedAt === 'number'
+            ? cached.payload.fetchedAt
+            : null;
+        const ageMs = fetchedAtSec != null ? now() - fetchedAtSec * 1000 : Infinity;
+        const bgRefreshAfterMs = 45 * 60 * 1000; // 45 minutes
+        if (ageMs >= bgRefreshAfterMs) {
+            esajdaLog('weather', 'localStorage cache HIT; background refresh → /weather.php', { cacheId, ageMs });
+            fetchWeatherFromServer(coords.latitude, coords.longitude)
+                .then((fresh) => {
+                    if (!fresh) return;
+                    const latest = readStore(WEATHER_CACHE_KEY, {});
+                    latest[cacheId] = { payload: fresh, expiresAt: now() + WEATHER_TTL_MS };
+                    writeStore(WEATHER_CACHE_KEY, latest);
+                })
+                .catch(() => {
+                    /* ignore background refresh failures */
+                });
+        } else {
+            esajdaLog('weather', 'localStorage cache HIT (skip background refresh)', { cacheId, ageMs });
+        }
         return cached.payload;
     }
 

@@ -100,7 +100,7 @@ function renderLinks(listEl, cities) {
  * - #country-cities-sub
  * - #country-cities-list
  */
-export async function initMajorCities(address, { limit = 30 } = {}) {
+export async function initMajorCities(address, { limit = 30, timeMeta: tmOverride } = {}) {
     const wrap = $('major-cities');
     const title = $('major-cities-title');
     const sub = $('major-cities-sub');
@@ -119,7 +119,7 @@ export async function initMajorCities(address, { limit = 30 } = {}) {
         return;
     }
 
-    const tm = await fetchTimeMeta(addr);
+    const tm = tmOverride && typeof tmOverride === 'object' ? tmOverride : await fetchTimeMeta(addr);
     const cc = tm?.country_code || '';
     const region = tm?.region || '';
 

@@ -1,9 +1,10 @@
 import { readLocationFromPageUrl } from './page-location.js';
 import { initThemeToggle } from './theme.js';
-import { $, hide } from './dom.js';
+import { $, show, hide } from './dom.js';
 import { startClockWidget, startLocalClockWidget } from './clock-widget.js';
 import { pathPrefixFromAddress } from './location-routing.js';
 import { initMajorCities } from './major-cities.js';
+import { readTimeMetaPrefetch } from './time-prefetch.js';
 
 let tzLineIntervalId = null;
 let leafletMap = null;
@@ -75,14 +76,13 @@ async function fetchCountryInfo(countryCode) {
     const cc = String(countryCode || '').trim().toLowerCase();
     if (!cc || cc.length !== 2) return null;
     try {
-        const url = new URL('https://restcountries.com/v3.1/alpha/' + encodeURIComponent(cc));
-        url.searchParams.set('fields', 'name,cca2,cca3,capital,region,subregion,timezones,population');
-        const r = await fetch(url.toString(), { headers: { Accept: 'application/json' } });
+        const url = new URL('/country-info.php', window.location.origin);
+        url.searchParams.set('code', cc);
+        const r = await fetch(url.toString(), { credentials: 'same-origin', headers: { Accept: 'application/json' } });
         if (!r.ok) return null;
         const j = await r.json();
-        const item = Array.isArray(j) ? j[0] : j;
-        if (!item || typeof item !== 'object') return null;
-        return item;
+        if (!j || !j.success || !j.data || typeof j.data !== 'object') return null;
+        return j.data;
     } catch (_) {
         return null;
     }
@@ -377,6 +377,154 @@ function deslugPathSegment(seg) {
         .replace(/\b\w/g, (m) => m.toUpperCase());
 }
 
+/**
+ * Fast path: clock + map + primary labels (no region-city list, DST, or country REST).
+ * Used with sessionStorage prefetch so the user sees the clock before /time-meta round-trip.
+ */
+function paintTimeCoreFromMeta(loc, tm, errEl) {
+    const tz = tm?.timezone || '';
+    if (!tz) return false;
+    startClockWidget(loc.address, tz);
+    if (errEl) hide(errEl);
+
+    const detailsEl = $('time-details');
+    if (detailsEl) show(detailsEl);
+
+    const continentGuess = tz.includes('/') ? tz.split('/')[0] : null;
+    setText('time-details-sub', continentGuess ? `Timezone region: ${continentGuess}` : '');
+
+    setText('time-iana', tz);
+    setText('time-tz-label', tzAbbreviation(tz) || '—');
+    setText('clock-timezone', `IANA: ${tz}`);
+    startTzLineTick(tz);
+
+    const offNow = getOffsetMinutes(tz, new Date());
+    setText('time-utc-offset', offsetToString(offNow));
+    setText('glance-offset', offsetToString(offNow));
+
+    const lat = tm?.latitude;
+    const lon = tm?.longitude;
+    setText('time-latlong', formatLatLon(lat, lon));
+    setText('glance-latlong', formatLatLon(lat, lon));
+    initLeafletMap(lat, lon, loc.address);
+
+    const region = tm?.region || null;
+    const country = tm?.country || null;
+    const cc = tm?.country_code || null;
+    const countryCode = cc ? String(cc).toLowerCase() : '';
+    const flag = flagEmojiFromCountryCode(cc);
+
+    setText('time-region', region || '—');
+    setText('glance-region', region || '—');
+    if (country) {
+        const cont = continentGuess ? ` (${continentGuess})` : '';
+        setText('time-country', `${flag ? flag + ' ' : ''}${country}${cont}`);
+    } else {
+        setText('time-country', '—');
+    }
+    setText('glance-iana', tz);
+    setText('glance-abbr', tzAbbreviation(tz) || '—');
+
+    const glanceCard = $('time-glance');
+    if (glanceCard) {
+        setText('glance-dst', '…');
+        glanceCard.classList.remove('hidden');
+    }
+    return true;
+}
+
+/** Slower path: country card, region quick links, DST text, then reveal full detail cards. */
+async function runTimePageSecondary(loc, tm) {
+    const tz = tm?.timezone || '';
+    if (!tz) return;
+
+    const offNow = getOffsetMinutes(tz, new Date());
+    const continentGuess = tz.includes('/') ? tz.split('/')[0] : null;
+    const region = tm?.region || null;
+    const country = tm?.country || null;
+    const cc = tm?.country_code || null;
+    const countryCode = cc ? String(cc).toLowerCase() : '';
+    const flag = flagEmojiFromCountryCode(cc);
+
+    if (country && countryCode) {
+        renderCountryInfo({ countryName: country, flag, continentGuess, countryCode });
+    }
+
+    if (countryCode && region) {
+        const regionPayload = await fetchRegionCities(countryCode, region);
+        const regionCities = regionPayload && Array.isArray(regionPayload.cities) ? regionPayload.cities : [];
+        renderRegionCities(region, regionCities);
+    }
+
+    const sd = standardAndDstOffsets(tz);
+    const abNow = tzAbbreviation(tz, new Date());
+    const abJan = tzAbbreviation(tz, new Date(Date.UTC(new Date().getFullYear(), 0, 15, 12, 0, 0)));
+    const abJul = tzAbbreviation(tz, new Date(Date.UTC(new Date().getFullYear(), 6, 15, 12, 0, 0)));
+
+    let stdAbbr = abJan;
+    let dstAbbr = abJul;
+    if (sd && sd.standard === sd.dst) {
+        stdAbbr = abNow || abJan || abJul;
+        dstAbbr = '—';
+    } else if (sd) {
+        const y = new Date().getFullYear();
+        const janOff = getOffsetMinutes(tz, new Date(Date.UTC(y, 0, 15, 12, 0, 0)));
+        const julOff = getOffsetMinutes(tz, new Date(Date.UTC(y, 6, 15, 12, 0, 0)));
+        if (janOff === sd.standard) stdAbbr = abJan;
+        if (julOff === sd.standard) stdAbbr = abJul;
+        if (janOff === sd.dst) dstAbbr = abJan;
+        if (julOff === sd.dst) dstAbbr = abJul;
+    }
+
+    setText('time-std-abbr', stdAbbr || '—');
+    setText('time-dst-abbr', dstAbbr || '—');
+
+    let dstLine = 'No';
+    if (sd && sd.standard !== sd.dst && Number.isFinite(offNow)) {
+        const isDst = offNow === sd.dst;
+        if (isDst) {
+            dstLine = `Yes ✅ (Abbreviation: ${abNow || '—'})`;
+            const next = await nextOffsetChange(tz, new Date());
+            if (next) {
+                const endAt = new Intl.DateTimeFormat('en-GB', {
+                    timeZone: tz,
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                }).format(next.date);
+                dstLine += ` (Ends: ${endAt})`;
+            }
+        } else {
+            dstLine = `No (Abbreviation: ${abNow || '—'})`;
+        }
+    } else if (abNow) {
+        dstLine = `— (Abbreviation: ${abNow})`;
+    }
+    setText('time-dst', dstLine);
+
+    let glanceDst = dstLine;
+    if (sd && sd.standard !== sd.dst && Number.isFinite(offNow)) {
+        const isDst = offNow === sd.dst;
+        if (isDst) {
+            glanceDst = `Yes (${abNow || '—'})`;
+        } else {
+            glanceDst = `No (${abNow || '—'})`;
+        }
+    } else if (abNow) {
+        glanceDst = `— (${abNow})`;
+    }
+    setText('glance-dst', glanceDst);
+
+    const glanceCard = $('time-glance');
+    if (glanceCard) glanceCard.classList.remove('hidden');
+    const detailsEl = $('time-details');
+    if (detailsEl) show(detailsEl);
+}
+
 function runTimesLanding() {
     const errEl = $('time-page-error');
     if (errEl) hide(errEl);
@@ -420,9 +568,6 @@ function main() {
         return;
     }
 
-    // Shared widgets (Major cities in region + country) — safe on any page that includes the sections.
-    void initMajorCities(loc.address);
-
     const heading = $('time-page-heading');
     if (heading) heading.textContent = 'Time in ' + loc.address;
     const tagEl = $('site-header-tagline');
@@ -432,136 +577,18 @@ function main() {
 
     const detailsEl = $('time-details');
 
+    const pref = readTimeMetaPrefetch(loc.address);
+    if (pref && pref.timezone) {
+        paintTimeCoreFromMeta(loc, pref, errEl);
+    }
+
     fetchTimeMeta(loc.address)
-        .then(async (tm) => {
+        .then((tm) => {
             const tz = tm?.timezone || '';
             if (!tz) throw new Error('no_tz');
-            startClockWidget(loc.address, tz);
-            hide(errEl);
-
-            // Heading/subtitle
-            const continentGuess = tz.includes('/') ? tz.split('/')[0] : null;
-            setText('time-details-sub', continentGuess ? `Timezone region: ${continentGuess}` : '');
-
-            // IANA + labels
-            setText('time-iana', tz);
-            setText('time-tz-label', tzAbbreviation(tz) || '—');
-            setText('clock-timezone', `IANA: ${tz}`);
-            startTzLineTick(tz);
-
-            // UTC offset
-            const offNow = getOffsetMinutes(tz, new Date());
-            setText('time-utc-offset', offsetToString(offNow));
-            setText('glance-offset', offsetToString(offNow));
-
-            // Lat/Lon from server-cached time meta
-            const lat = tm?.latitude;
-            const lon = tm?.longitude;
-            setText('time-latlong', formatLatLon(lat, lon));
-            setText('glance-latlong', formatLatLon(lat, lon));
-            initLeafletMap(lat, lon, loc.address);
-
-            // Country / region via server-cached time meta
-            const region = tm?.region || null;
-            const country = tm?.country || null;
-            const cc = tm?.country_code || null;
-            const countryCode = cc ? String(cc).toLowerCase() : '';
-            const flag = flagEmojiFromCountryCode(cc);
-
-            setText('time-region', region || '—');
-            setText('glance-region', region || '—');
-            if (country) {
-                const cont = continentGuess ? ` (${continentGuess})` : '';
-                setText('time-country', `${flag ? flag + ' ' : ''}${country}${cont}`);
-            } else {
-                setText('time-country', '—');
-            }
-            setText('glance-iana', tz);
-            setText('glance-abbr', tzAbbreviation(tz) || '—');
-
-            // Country-wide popular cities: filled by initMajorCities → /country-cities.php (DB first).
-
-            // Country metadata (continent/capital/ISO/timezones/population)
-            if (country && countryCode) {
-                renderCountryInfo({ countryName: country, flag, continentGuess, countryCode });
-            }
-
-            // Cities in the same region/state (cached on our server)
-            if (countryCode && region) {
-                const regionPayload = await fetchRegionCities(countryCode, region);
-                const regionCities = regionPayload && Array.isArray(regionPayload.cities) ? regionPayload.cities : [];
-                renderRegionCities(region, regionCities);
-            }
-
-            // DST + abbreviations
-            const sd = standardAndDstOffsets(tz);
-            const abNow = tzAbbreviation(tz, new Date());
-            const abJan = tzAbbreviation(tz, new Date(Date.UTC(new Date().getFullYear(), 0, 15, 12, 0, 0)));
-            const abJul = tzAbbreviation(tz, new Date(Date.UTC(new Date().getFullYear(), 6, 15, 12, 0, 0)));
-
-            let stdAbbr = abJan;
-            let dstAbbr = abJul;
-            if (sd && sd.standard === sd.dst) {
-                stdAbbr = abNow || abJan || abJul;
-                dstAbbr = '—';
-            } else if (sd) {
-                // pick the abbreviation that matches standard offset vs dst offset
-                const y = new Date().getFullYear();
-                const janOff = getOffsetMinutes(tz, new Date(Date.UTC(y, 0, 15, 12, 0, 0)));
-                const julOff = getOffsetMinutes(tz, new Date(Date.UTC(y, 6, 15, 12, 0, 0)));
-                if (janOff === sd.standard) stdAbbr = abJan;
-                if (julOff === sd.standard) stdAbbr = abJul;
-                if (janOff === sd.dst) dstAbbr = abJan;
-                if (julOff === sd.dst) dstAbbr = abJul;
-            }
-
-            setText('time-std-abbr', stdAbbr || '—');
-            setText('time-dst-abbr', dstAbbr || '—');
-
-            let dstLine = 'No';
-            if (sd && sd.standard !== sd.dst && Number.isFinite(offNow)) {
-                const isDst = offNow === sd.dst;
-                if (isDst) {
-                    dstLine = `Yes ✅ (Abbreviation: ${abNow || '—'})`;
-                    const next = await nextOffsetChange(tz, new Date());
-                    if (next) {
-                        const endAt = new Intl.DateTimeFormat('en-GB', {
-                            timeZone: tz,
-                            weekday: 'long',
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: false,
-                        }).format(next.date);
-                        dstLine += ` (Ends: ${endAt})`;
-                    }
-                } else {
-                    dstLine = `No (Abbreviation: ${abNow || '—'})`;
-                }
-            } else if (abNow) {
-                dstLine = `— (Abbreviation: ${abNow})`;
-            }
-            setText('time-dst', dstLine);
-            // Keep glance concise; full detail stays in Time details.
-            let glanceDst = dstLine;
-            if (sd && sd.standard !== sd.dst && Number.isFinite(offNow)) {
-                const isDst = offNow === sd.dst;
-                if (isDst) {
-                    glanceDst = `Yes (${abNow || '—'})`;
-                } else {
-                    glanceDst = `No (${abNow || '—'})`;
-                }
-            } else if (abNow) {
-                glanceDst = `— (${abNow})`;
-            }
-            setText('glance-dst', glanceDst);
-
-            // At a glance card becomes visible when we have core data
-            const glanceCard = $('time-glance');
-            if (glanceCard) glanceCard.classList.remove('hidden');
-            show(detailsEl);
+            paintTimeCoreFromMeta(loc, tm, errEl);
+            void initMajorCities(loc.address, { timeMeta: tm });
+            void runTimePageSecondary(loc, tm);
         })
         .catch(() => {
             show(errEl);
